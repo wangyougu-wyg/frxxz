@@ -1,0 +1,2908 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="lucklyjkop">
+<meta name="description" content="凡人修仙传文字游戏面板，由lucklyjkop独立开发，禁止二改二创。">
+
+<title>lucklyjkop（禁止二改二创面板）</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leancloud-storage/dist/av-min.js"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-night">
+
+<div id="splash-screen">
+<video id="splash-video-bg" src="https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1752805008624_qdqqd_3tw59r.mp4" autoplay loop muted playsinline></video>
+<div id="splash-content">
+    <h1 id="splash-title">凡人修仙传</h1>
+    <p id="splash-info">作者: LUCKLYJKOP | 版本: 9.4  | 沉浸式的修仙文字世界</p>
+    <div id="splash-buttons">
+        <button id="start-new-life-btn" class="splash-btn">开始新人生</button>
+        <button id="load-life-btn" class="splash-btn">读取人生</button>
+		<button id="workshop-splash-btn" class="splash-btn">创意工坊</button>
+    </div>
+</div>
+<button id="splash-settings-btn" class="splash-corner-btn" title="缓存管理"><i class="fas fa-cog"></i></button>
+<button id="splash-import-btn" class="splash-corner-btn" title="导入/导出"><i class="fas fa-exchange-alt"></i></button>
+<button id="splash-refresh-btn" class="splash-corner-btn" title="刷新背景"><i class="fas fa-sync-alt"></i></button>
+<button id="splash-fullscreen-btn" class="splash-corner-btn" title="全屏"><i class="fas fa-expand"></i></button>
+</div>
+
+<div id="splash-io-menu-overlay" class="overlay">
+<div id="splash-io-menu-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>导入 / 导出</h4>
+<div class="splash-io-actions">
+<button id="splash-import-archive-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入存档</button>
+<button id="splash-export-archive-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出存档</button>
+<button id="splash-import-preset-btn" class="major-action-button"><i class="fas fa-magic"></i> 导入开局预设</button>
+<button id="splash-export-preset-btn" class="major-action-button"><i class="fas fa-scroll"></i> 导出开局预设</button>
+<button id="open-workshop-btn" class="major-action-button full-width" style="border-color: #ffd700; color: #ffd700;"><i class="fas fa-store"></i> 创意工坊</button>
+<button id="open-splash-cloud-settings-btn" class="major-action-button"><i class="fas fa-cloud"></i> 云存档设置</button>
+</div>
+</div>
+</div>
+
+<div id="workshop-overlay" class="overlay">
+<div id="workshop-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+
+
+<div id="workshop-main-view">
+<h4><i class="fas fa-store"></i> 创意工坊</h4>
+<fieldset style="border: 1px solid var(--separator-color); border-radius: 8px; padding: 15px; margin: 0 20px 20px;">
+<legend style="padding: 0 10px; color: var(--primary-color);">个人管理</legend>
+<div style="display: flex; gap: 15px; justify-content: center;">
+<button id="workshop-set-key-btn" class="major-action-button"><i class="fas fa-key"></i> 密钥设置</button>
+<button id="workshop-manage-works-btn" class="major-action-button"><i class="fas fa-book-reader"></i> 作品管理</button>
+</div>
+</fieldset>
+<div id="workshop-category-grid">
+<div class="workshop-category-card" data-category="preset">
+<i class="fas fa-scroll category-icon"></i>
+<span class="category-name">开局预设</span>
+<span class="category-count" id="preset-upload-count">--</span>
+</div>
+<div class="workshop-category-card" data-category="birth">
+<i class="fas fa-baby category-icon"></i>
+<span class="category-name">自定义出身</span>
+<span class="category-count" id="birth-upload-count">--</span>
+</div>
+<div class="workshop-category-card" data-category="race">
+<i class="fas fa-dragon category-icon"></i>
+<span class="category-name">自定义种族</span>
+<span class="category-count" id="race-upload-count">--</span>
+</div>
+<div class="workshop-category-card" data-category="trait">
+<i class="fas fa-star category-icon"></i>
+<span class="category-name">自定义词条</span>
+<span class="category-count" id="trait-upload-count">--</span>
+</div>
+<div class="workshop-category-card" data-category="bondedCharacter">
+<i class="fas fa-users category-icon"></i>
+<span class="category-name">羁绊人物</span>
+<span class="category-count" id="bondedCharacter-upload-count">--</span>
+</div>
+    <div class="workshop-category-card" data-category="world_book">
+        <i class="fas fa-atlas category-icon"></i>
+        <span class="category-name">世界书</span>
+        <span class="category-count" id="world_book-upload-count">--</span>
+    </div>
+</div>
+</div>
+
+
+<div id="workshop-list-view" class="hidden">
+<button id="back-to-workshop-main-btn" class="major-action-button" style="margin-bottom: 15px; width: auto; align-self: flex-start;"><i class="fas fa-arrow-left"></i> 返回</button>
+<h4 id="workshop-list-title"></h4>
+<div id="workshop-controls">
+<input type="text" id="workshop-search-input" placeholder="搜索名称、作者或标签...">
+<div class="workshop-actions">
+<select id="workshop-sort-select">
+<option value="createdAt">最新上传</option>
+<option value="downloads">最热下载</option>
+<option value="random">随机排序</option>
+</select>
+<button id="workshop-refresh-btn" class="major-action-button"><i class="fas fa-sync-alt"></i> 刷新</button>
+<button id="workshop-upload-btn" class="major-action-button"><i class="fas fa-upload"></i> 上传我的内容</button>
+</div>
+</div>
+<div id="workshop-list"></div>
+<div id="workshop-pagination"></div>
+</div>
+</div>
+</div>
+
+<div id="world-map-overlay" class="overlay">
+<div id="world-map-modal" class="modal">
+    <div class="map-modal-header">
+        <h4>世界地图</h4>
+        <div class="map-zoom-controls">
+            <button class="map-zoom-btn" data-action="zoom-in">+</button>
+            <button class="map-zoom-btn" data-action="zoom-out">-</button>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+    </div>
+<div id="world-map-npc-carousel" class="hidden">
+</div>
+    <div id="world-map-container">
+        <canvas id="world-map-canvas"></canvas>
+    </div>
+    <div id="world-map-info-panel">
+        <p>点击地图任意位置查看详情。</p>
+    </div>
+</div>
+</div>
+
+<div id="map-selection-overlay" class="overlay">
+<div id="map-selection-modal" class="modal">
+    <div class="map-modal-header">
+        <h4>选择你的出生地</h4>
+        <div class="map-zoom-controls">
+            <button class="map-zoom-btn" data-action="zoom-in">+</button>
+            <button class="map-zoom-btn" data-action="zoom-out">-</button>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+    </div>
+    <div id="map-container">
+        <canvas id="map-canvas"></canvas>
+    </div>
+    <div id="map-info-panel">
+        <p>在地图上点击选择一个出生点。</p>
+    </div>
+</div>
+</div>
+
+<div id="character-creator-overlay" class="overlay">
+<div id="character-creator-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div id="creator-main-view">
+        <h4>角色制作器</h4>
+        <div id="creator-list" class="creator-list"></div>
+        <div class="manager-actions">
+            <button id="creator-create-btn" class="major-action-button"><i class="fas fa-plus"></i> 新建角色模板</button>
+            <button id="creator-import-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入</button>
+            <button id="creator-export-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出</button>
+        </div>
+    </div>
+    <div id="creator-editor-view" class="hidden">
+        <button id="back-to-creator-list-btn" class="major-action-button" style="margin-bottom: 15px; width: auto; align-self: flex-start;"><i class="fas fa-arrow-left"></i> 返回列表</button>
+        <div class="modal-content">
+            <input type="text" id="creator-char-name" placeholder="角色名 (用于匹配)">
+            <div id="favor-stages-container"></div>
+            <button id="add-favor-stage-btn" class="major-action-button"><i class="fas fa-plus"></i> 添加好感度阶段</button>
+        </div>
+        <button id="save-creator-char-btn" class="major-action-button" style="margin-top: 15px;">保存角色模板</button>
+    </div>
+</div>
+</div>
+
+<div id="dino-game-overlay" class="overlay">
+<div id="dino-game-container">
+    <canvas id="dino-game-canvas"></canvas>
+    <div id="dino-start-screen">
+        <div id="dino-highscore-display">HI 0</div>
+        <button id="dino-start-btn">开始游戏</button>
+    </div>
+    <div id="dino-score-display" class="hidden">0</div>
+</div>
+</div>
+
+<div id="achievement-overlay" class="overlay">
+<div id="achievement-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+
+<div class="auto-gen-toggle-container" style="position: static; transform: none;">
+<label for="achievement-system-toggle" class="switch-label">成就系统</label>
+<label class="switch">
+<input type="checkbox" id="achievement-system-toggle">
+<span class="slider round"></span>
+</label>
+</div>
+<h4>成就墙</h4>
+
+<div style="display: flex; align-items: center; gap: 10px;">
+<span id="achievement-stats">完成: 0 / 总数: 0</span>
+</div>
+</div>
+<div class="modal-content">
+<div id="achievement-bookshelf" class="bookshelf"></div>
+</div>
+<div class="modal-footer">
+<button id="custom-achievements-btn" class="major-action-button" style="width: auto; padding: 10px 20px;"><i class="fas fa-cog"></i> 自定义</button>
+</div>
+</div>
+</div>
+
+
+<div id="achievement-toast-container"></div>
+
+<div id="achievement-detail-overlay" class="overlay">
+<div id="achievement-detail-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div class="item-detail-header">
+        <i id="achievement-detail-icon" class="fas fa-trophy"></i>
+        <span id="achievement-detail-name"></span>
+    </div>
+    <div class="achievement-detail-row">
+        <span class="achievement-detail-label">品质:</span>
+        <span id="achievement-detail-quality" class="achievement-detail-value"></span>
+    </div>
+    <div class="achievement-detail-row">
+        <span class="achievement-detail-label">说明:</span>
+        <span id="achievement-detail-desc" class="achievement-detail-value"></span>
+    </div>
+    <div id="achievement-detail-requirements-container" class="hidden">
+        <div class="achievement-detail-row">
+            <span class="achievement-detail-label">完成条件:</span>
+            <span id="achievement-detail-requirements" class="achievement-detail-value"></span>
+        </div>
+    </div>
+    <div id="achievement-detail-reward-container" class="hidden">
+        <div class="achievement-detail-row">
+            <span class="achievement-detail-label">奖励:</span>
+            <span id="achievement-detail-reward" class="achievement-detail-value"></span>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="custom-achievement-manager-overlay" class="overlay">
+<div id="custom-achievement-manager-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自定义成就</h4>
+    <div class="modal-content">
+        <div id="custom-achievement-list"></div>
+        <div class="manager-actions">
+            <button id="ca-create-btn" class="major-action-button"><i class="fas fa-plus"></i> 新建</button>
+            <button id="ca-import-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入</button>
+            <button id="ca-export-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="custom-achievement-editor-overlay" class="overlay">
+<div id="custom-achievement-editor-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="custom-achievement-editor-title">编辑成就</h4>
+    <div class="modal-content modal-beautified">
+        <fieldset>
+            <legend>基本信息</legend>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="ca-editor-name">成就名称:</label>
+                    <input type="text" id="ca-editor-name">
+                </div>
+                <div class="form-group full-width">
+                    <label for="ca-editor-desc">成就说明:</label>
+                    <textarea id="ca-editor-desc" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ca-editor-completion-text">完成提示:</label>
+                    <input type="text" id="ca-editor-completion-text">
+                </div>
+                <div class="form-group">
+                    <label for="ca-editor-quality">成就品质:</label>
+                    <select id="ca-editor-quality"></select>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>完成条件</legend>
+            <div class="form-group">
+                <label for="ca-editor-req-type">检测类型:</label>
+                <select id="ca-editor-req-type">
+                    <option value="player_attr">玩家属性</option>
+                    <option value="ai_response">AI回复</option>
+                    <option value="variable">世界变量</option>
+                </select>
+            </div>
+            <div id="ca-editor-req-details" class="requirement-details"></div>
+        </fieldset>
+        <fieldset>
+            <legend>成就奖励 (可选)</legend>
+            <div class="form-group">
+                <label for="ca-editor-reward-type">奖励类型:</label>
+                <select id="ca-editor-reward-type">
+                    <option value="none">无</option>
+                    <option value="item">发放物品</option>
+                    <option value="character">添加人物</option>
+                    <option value="skill">获得技能</option>
+                    <option value="beast">获得灵兽</option>
+                    <option value="task">触发任务</option>
+                    <option value="world_event">触发世界大事</option>
+                </select>
+            </div>
+            <div id="ca-editor-reward-details" class="reward-details"></div>
+        </fieldset>
+    </div>
+    <button id="save-custom-achievement-btn" class="major-action-button" style="margin-top: 20px;">保存成就</button>
+</div>
+</div>
+
+<div id="ai-image-gen-overlay" class="overlay">
+<div id="ai-image-gen-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>AI 生图</h4>
+
+
+<div class="modal-content">
+<div class="settings-section">
+<div class="context-control-item">
+<input type="checkbox" id="auto-image-gen-toggle">
+<label for="auto-image-gen-toggle">开启自动生图</label>
+</div>
+</div>
+<div class="settings-section">
+<h5>自定义生图正则</h5>
+<label for="ai-gen-regex-input">使用此正则从AI回复中提取提示词 (捕获组1)。如果匹配成功，将优先使用，否则回退到 &lt;pic&gt; 标签。</label>
+<input type="text" id="ai-gen-regex-input" placeholder="/你的正则/flags，例如：生图：(.*?)$/m">
+</div>
+<div class="settings-section">
+<label for="ai-gen-prompt">提示词:</label>
+<textarea id="ai-gen-prompt" rows="4">1girl, solo, looking at viewer, masterpiece, best quality</textarea>
+</div>
+<div class="settings-section" style="display: flex; gap: 20px;">
+<div>
+<label for="ai-gen-width">宽度:</label>
+<input type="number" id="ai-gen-width" value="512">
+</div>
+<div>
+<label for="ai-gen-height">高度:</label>
+<input type="number" id="ai-gen-height" value="768">
+</div>
+</div>
+</div>
+
+
+<button id="ai-gen-start-btn" class="major-action-button"><i class="fas fa-magic"></i> 开始生成</button>
+<div id="ai-gen-status" style="text-align: center; margin-top: 15px;"></div>
+</div>
+</div>
+
+<!-- 提示词编辑模态窗口 -->
+<div id="prompt-edit-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>编辑并重新生成背景</h3>
+        <p>你可以在下方修改上次生成背景所用的提示词。</p>
+        <textarea id="prompt-edit-textarea" rows="6" placeholder="输入你想要的背景图关键词，例如：masterpiece, best quality, 1girl, solo, ancient chinese palace, night, moon..."></textarea>
+        <div class="modal-buttons">
+            <button id="prompt-edit-cancel-btn" class="modal-btn modal-btn-secondary">取消</button>
+            <button id="prompt-edit-generate-btn" class="modal-btn modal-btn-primary">生成</button>
+        </div>
+    </div>
+</div>
+
+<div id="enhancement-overlay" class="overlay">
+<div class="modal">
+    <video id="enhancement-bg" src="https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1752930079983_qdqqd_3c2n79.mp4" autoplay loop muted playsinline></video>
+    <div id="enhancement-ui">
+        <div style="position: absolute; top: 20px; right: 20px; z-index: 5;">
+                <button id="open-enhancement-manager-btn" class="major-action-button"><i class="fas fa-cog"></i> 管理强化</button>
+        </div>
+        <div id="enhancement-grid">
+            <div class="enhancement-slot" id="enhancement-material-slot-1" data-slot-index="0"></div>
+            <div class="enhancement-slot" id="enhancement-material-slot-2" data-slot-index="1"></div>
+            <div class="enhancement-slot" id="enhancement-material-slot-3" data-slot-index="2"></div>
+            <div class="enhancement-slot" id="enhancement-material-slot-4" data-slot-index="3"></div>
+            <div class="enhancement-slot" id="enhancement-main-slot"></div>
+        </div>
+        <div id="enhancement-info">
+            <div id="enhancement-success-rate">成功率: --%</div>
+            <div id="enhancement-requirements">需要: 4 材料 或 2 重要物品</div>
+            <button id="start-enhancement-btn" class="major-action-button" disabled>开始强化</button>
+        </div>
+    </div>
+    <button class="modal-close-btn">&times;</button>
+</div>
+</div>
+
+<div id="enhancement-manager-overlay" class="overlay">
+<div class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div id="enhancement-manager-ui">
+        <h4>强化管理</h4>
+        <div id="enhancement-manager-grid">
+            <div id="enhancement-manager-item-view">
+                <h5>选择装备 & 祭品</h5>
+                <div id="enhancement-manager-item-slot" class="enhancement-slot"><span>选择要管理的装备</span></div>
+                <div id="enhancement-manager-sacrifice-slot" class="enhancement-slot"><span>选择祭品 (可装备物品)</span></div>
+            </div>
+            <div id="enhancement-manager-affix-view">
+                <h5>词条列表 (点击删除)</h5>
+                <div id="enhancement-manager-affix-list"></div>
+                <button id="manage-custom-affixes-btn" class="major-action-button"><i class="fas fa-plus-circle"></i> 管理自定义词条</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="custom-affix-editor-overlay" class="overlay">
+<div class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自定义强化词条</h4>
+    <div class="modal-content">
+        <div id="custom-affix-list"></div>
+        <div class="manager-actions">
+            <button id="add-custom-affix-btn" class="major-action-button"><i class="fas fa-plus"></i> 新建词条</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="alchemy-overlay" class="overlay">
+<div class="modal">
+    <video id="alchemy-bg" src="https://s3plus.meituan.net/v1/mss_7543a560195745779262194d8f5379a5/video/6105151.mp4" autoplay loop muted playsinline></video>
+    <div id="alchemy-ui">
+            <h4>炼丹炉</h4>
+        <div id="alchemy-grid">
+            <div class="crafting-slot" id="alchemy-material-slot-1" data-slot-index="0"></div>
+            <div class="crafting-slot" id="alchemy-material-slot-2" data-slot-index="1"></div>
+            <div class="crafting-slot" id="alchemy-material-slot-3" data-slot-index="2"></div>
+            <div class="crafting-slot" id="alchemy-material-slot-4" data-slot-index="3"></div>
+        </div>
+        <div id="alchemy-info">
+            <div id="alchemy-requirements">放入 1-4 个材料</div>
+            <button id="start-alchemy-btn" class="major-action-button" disabled>开始炼丹</button>
+        </div>
+    </div>
+    <button class="modal-close-btn">&times;</button>
+</div>
+</div>
+
+<div id="refining-overlay" class="overlay">
+<div class="modal">
+    <video id="refining-bg" src="https://s3plus.meituan.net/v1/mss_7543a560195745779262194d8f5379a5/video/5133698.mp4" autoplay loop muted playsinline></video>
+    <div id="refining-ui">
+            <h4>炼器台</h4>
+        <div id="refining-grid">
+            <div class="crafting-slot" id="refining-material-slot-1" data-slot-index="0"></div>
+            <div class="crafting-slot" id="refining-material-slot-2" data-slot-index="1"></div>
+            <div class="crafting-slot" id="refining-material-slot-3" data-slot-index="2"></div>
+            <div class="crafting-slot" id="refining-material-slot-4" data-slot-index="3"></div>
+        </div>
+        <div id="refining-info">
+            <div id="refining-requirements">放入 4 个重要物品</div>
+            <button id="start-refining-btn" class="major-action-button" disabled>开始炼器</button>
+        </div>
+    </div>
+    <button class="modal-close-btn">&times;</button>
+</div>
+</div>
+
+<div id="warehouse-overlay" class="overlay">
+<div class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>安全箱 (极限模式)</h4>
+    <div id="warehouse-grid"></div>
+</div>
+</div>
+
+<div id="warehouse-picker-overlay" class="overlay">
+<div class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="warehouse-picker-title">选择要存入的物品</h4>
+    <div id="warehouse-category-selector"></div>
+    <div id="warehouse-item-list"></div>
+</div>
+</div>
+
+<div id="custom-dialog-overlay" class="overlay">
+<div id="custom-dialog-modal" class="modal">
+    <h4 id="custom-dialog-title">提示</h4>
+    <p id="custom-dialog-message"></p>
+    <input type="text" id="custom-dialog-input" class="hidden">
+    <div id="custom-dialog-buttons"></div>
+</div>
+</div>
+
+<div id="cache-manager-overlay" class="overlay">
+<div id="cache-manager-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>缓存数据管理</h4>
+    <div class="modal-content">
+        <div class="cache-item">
+            <div><span class="cache-item-label">所有存档数据</span></div>
+            <div><span id="archives-data-size" class="cache-item-size">-- KB</span><button id="delete-archives-data-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+        <div class="cache-item">
+            <div><span class="cache-item-label">总结设置</span></div>
+            <div><span id="summary-settings-size" class="cache-item-size">-- KB</span><button id="delete-summary-settings-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+        <div class="cache-item">
+            <div><span class="cache-item-label">正则设置</span></div>
+            <div><span id="regex-settings-size" class="cache-item-size">-- KB</span><button id="delete-regex-settings-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+            <div class="cache-item">
+                <div><span class="cache-item-label">自定义词条</span></div>
+            <div><span id="traits-size" class="cache-item-size">-- KB</span><button id="delete-custom-traits-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+            <div class="cache-item">
+            <div><span class="cache-item-label">羁绊人物名册</span></div>
+            <div><span id="bonded-chars-size" class="cache-item-size">-- KB</span><button id="delete-bonded-chars-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+            <div class="cache-item">
+            <div><span class="cache-item-label">自定义出身</span></div>
+            <div><span id="custom-births-size" class="cache-item-size">-- KB</span><button id="delete-custom-births-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+            <div class="cache-item">
+            <div><span class="cache-item-label">自定义种族</span></div>
+            <div><span id="custom-races-size" class="cache-item-size">-- KB</span><button id="delete-custom-races-btn" class="cache-delete-btn">删除</button></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="character-creation-screen" class="hidden">
+<div class="creation-container">
+    <button id="creation-fullscreen-btn" class="control-button"><i class="fas fa-expand"></i></button>
+    <div class="creation-header">
+        <h2 id="creation-title">开辟鸿蒙</h2>
+        <p id="creation-subtitle">请选择你的道途</p>
+    </div>
+	        <div style="text-align: center; margin-bottom: 20px;">
+<button id="load-last-preset-btn" class="major-action-button" style="width: auto; padding: 10px 25px;">
+    <i class="fas fa-store"></i> 打开创意工坊
+</button>
+        </div>
+    <div id="creation-step-indicator" class="creation-step-indicator"></div>
+    <div id="creation-content" class="creation-content"></div>
+    <div id="creation-nav" class="creation-nav"></div>
+</div>
+</div>
+
+<div id="custom-birth-selection-overlay" class="overlay">
+<div id="custom-birth-selection-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自定义出身名册</h4>
+    <div class="modal-content">
+        <div id="custom-birth-selection-list"></div>
+        <div id="custom-birth-manager-actions" class="manager-actions">
+                <button class="major-action-button" data-action="create"><i class="fas fa-plus"></i> 新建</button>
+                <button class="major-action-button" data-action="import"><i class="fas fa-file-import"></i> 导入</button>
+                <button class="major-action-button" data-action="export"><i class="fas fa-file-export"></i> 导出</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="custom-race-selection-overlay" class="overlay">
+<div id="custom-race-selection-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自定义种族名册</h4>
+    <div class="modal-content">
+        <div id="custom-race-selection-list"></div>
+        <div id="custom-race-manager-actions" class="manager-actions">
+                <button class="major-action-button" data-action="create"><i class="fas fa-plus"></i> 新建</button>
+                <button class="major-action-button" data-action="import"><i class="fas fa-file-import"></i> 导入</button>
+                <button class="major-action-button" data-action="export"><i class="fas fa-file-export"></i> 导出</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="custom-birth-overlay" class="overlay">
+<div id="custom-birth-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="custom-birth-editor-title">自定义出身</h4>
+    <div class="modal-content modal-beautified">
+        <fieldset>
+            <legend>基本信息</legend>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="custom-birth-tag">自定义标识 (必填)</label>
+                    <input type="text" id="custom-birth-tag" placeholder="例如：失落王族">
+                </div>
+                <div class="form-group">
+                    <label for="custom-birth-name">出身身份</label>
+                    <input type="text" id="custom-birth-name" placeholder="例如：失落的王族后裔">
+                </div>
+                <div class="form-group full-width">
+                    <label for="custom-birth-desc">身份效果 (将写入世界书)</label>
+                    <textarea id="custom-birth-desc" rows="3" placeholder="例如：你出生于一个早已被世人遗忘的王朝..."></textarea>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>自定义属性 (总和不能超过10点)</legend>
+            <div id="custom-attr-points-summary" style="text-align: center; margin-bottom: 10px;"></div>
+            <div id="custom-birth-attributes" class="attribute-allocation-grid"></div>
+        </fieldset>
+    </div>
+    <button id="save-custom-birth-btn" class="major-action-button" style="margin-top: 20px;">保存</button>
+</div>
+</div>
+
+<div id="custom-race-overlay" class="overlay">
+<div id="custom-race-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="custom-race-editor-title">自定义种族</h4>
+    <div class="modal-content modal-beautified">
+        <fieldset>
+            <legend>基本信息</legend>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="custom-race-tag">自定义标识 (必填)</label>
+                    <input type="text" id="custom-race-tag" placeholder="例如：半蛟">
+                </div>
+                <div class="form-group">
+                    <label for="custom-race-name">种族名称</label>
+                    <input type="text" id="custom-race-name" placeholder="例如：半人半蛟">
+                </div>
+                <div class="form-group full-width">
+                    <label for="custom-race-desc">种族效果 (将写入世界书)</label>
+                    <textarea id="custom-race-desc" rows="3" placeholder="例如：体内流淌着上古蛟龙的血脉..."></textarea>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>自定义属性 (总和不能超过10点)</legend>
+            <div id="custom-race-attr-points-summary" style="text-align: center; margin-bottom: 10px;"></div>
+            <div id="custom-race-attributes" class="attribute-allocation-grid"></div>
+        </fieldset>
+    </div>
+    <button id="save-custom-race-btn" class="major-action-button" style="margin-top: 20px;">保存</button>
+</div>
+</div>
+
+<div id="trait-detail-overlay" class="overlay">
+<div id="trait-detail-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div class="item-detail-header">
+        <i id="trait-detail-icon" class="fas fa-star"></i>
+        <span id="trait-detail-name"></span>
+    </div>
+    <div class="trait-detail-row">
+        <span class="trait-detail-label">品质:</span>
+        <span id="trait-detail-rarity" class="trait-detail-value"></span>
+    </div>
+    <div class="trait-detail-row">
+        <span class="trait-detail-label">描述:</span>
+        <span id="trait-detail-desc" class="trait-detail-value"></span>
+    </div>
+    <div class="trait-detail-row">
+        <span class="trait-detail-label">效果:</span>
+        <span id="trait-detail-effects" class="trait-detail-value"></span>
+    </div>
+    <div id="trait-detail-bonuses"></div>
+</div>
+</div>
+
+<div id="selected-traits-overlay" class="overlay">
+<div id="selected-traits-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>已选词条</h4>
+    <ul id="selected-traits-list"></ul>
+</div>
+</div>
+
+<div id="self-select-trait-overlay" class="overlay">
+<div id="self-select-trait-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自选词条</h4>
+    <div id="self-select-trait-grid"></div>
+</div>
+</div>
+
+<div id="self-select-linggen-overlay" class="overlay">
+<div id="self-select-linggen-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自选灵根</h4>
+    <div class="modal-content"></div>
+</div>
+</div>
+
+<div id="custom-trait-manager-overlay" class="overlay">
+<div id="custom-trait-manager-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>自定义词条管理器</h4>
+    <div class="modal-content">
+        <div id="custom-traits-list"></div>
+        <div class="manager-actions">
+            <button id="custom-trait-create-btn" class="major-action-button"><i class="fas fa-plus"></i> 新建</button>
+            <button id="custom-trait-import-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入</button>
+            <button id="custom-trait-export-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出</button>
+            <button id="custom-trait-delete-btn" class="major-action-button"><i class="fas fa-trash"></i> 删除</button>
+            <button id="custom-trait-pool-toggle-btn" class="major-action-button"><i class="fas fa-sync-alt"></i> 切换</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="custom-trait-editor-overlay" class="overlay">
+<div id="custom-trait-editor-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="custom-trait-editor-title">创建/编辑词条</h4>
+    <div class="modal-content modal-beautified">
+        <fieldset>
+            <legend>基本信息</legend>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="custom-trait-rarity">词条品质</label>
+                    <select id="custom-trait-rarity"></select>
+                </div>
+                <div class="form-group">
+                    <label for="custom-trait-name">词条名称</label>
+                    <input type="text" id="custom-trait-name" placeholder="例如：天煞孤星">
+                </div>
+                <div class="form-group full-width">
+                    <label for="custom-trait-desc">词条描述</label>
+                    <textarea id="custom-trait-desc" rows="2" placeholder="对此词条的简短描述"></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label for="custom-trait-effects">词条效果</label>
+                    <input type="text" id="custom-trait-effects" placeholder="例如：社交活动中好感度获取-50%">
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>属性加成</legend>
+            <div id="custom-trait-bonus-grid" class="attribute-allocation-grid"></div>
+        </fieldset>
+        <fieldset>
+            <legend>附带物品</legend>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="custom-trait-item-name">物品名</label>
+                    <input type="text" id="custom-trait-item-name" placeholder="无则留空">
+                </div>
+                <div class="form-group">
+                    <label for="custom-trait-item-type">类型</label>
+                    <select id="custom-trait-item-type"></select>
+                </div>
+                <div class="form-group full-width">
+                    <label for="custom-trait-item-desc">描述</label>
+                    <input type="text" id="custom-trait-item-desc">
+                </div>
+                <div class="form-group">
+                    <label for="custom-trait-item-effect">效果</label>
+                    <input type="text" id="custom-trait-item-effect">
+                </div>
+                <div class="form-group">
+                    <label for="custom-trait-item-quantity">数量</label>
+                    <input type="number" id="custom-trait-item-quantity" value="1" min="1">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <button id="save-custom-trait-btn" class="major-action-button" style="margin-top: 20px;">保存词条</button>
+</div>
+</div>
+
+<div id="deeds-timeline-overlay" class="overlay">
+<div id="deeds-timeline-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="deeds-timeline-title">人物事迹</h4>
+    <ul id="deeds-timeline-list"></ul>
+</div>
+</div>
+
+<div id="world-events-overlay" class="overlay">
+<div id="world-events-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>世界大事记</h4>
+    <ul id="world-events-list"></ul>
+</div>
+</div>
+
+<div id="bonded-character-selection-overlay" class="overlay">
+<div id="bonded-character-selection-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>羁绊人物名册</h4>
+    <div class="modal-content">
+        <div id="bonded-character-selection-list"></div>
+        <div id="bonded-char-manager-actions" class="selection-actions">
+                <button id="manage-bonded-chars-btn" class="major-action-button"><i class="fas fa-users-cog"></i> 管理名册</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="bonded-character-editor-overlay" class="overlay">
+<div id="bonded-character-editor-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="bonded-character-editor-title">编辑羁绊人物</h4>
+    <div class="modal-content modal-beautified">
+        <fieldset>
+            <legend>基本信息</legend>
+            <div class="form-grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
+                <div class="form-group"><label for="bc-editor-name">姓名:</label><input type="text" id="bc-editor-name"></div>
+                <div class="form-group"><label for="bc-editor-gender">性别:</label><select id="bc-editor-gender"><option value="男">男</option><option value="女">女</option></select></div>
+                <div class="form-group"><label for="bc-editor-realm">境界:</label><input type="text" id="bc-editor-realm"></div>
+                <div class="form-group"><label for="bc-editor-identity">身份:</label><input type="text" id="bc-editor-identity"></div>
+                <div class="form-group"><label for="bc-editor-age">年龄:</label><input type="number" id="bc-editor-age" min="1"></div>
+                <div class="form-group"><label for="bc-editor-shouyuan">寿元:</label><input type="number" id="bc-editor-shouyuan" min="1"></div>
+                <div class="form-group"><label for="bc-editor-favorability">好感度:</label><input type="number" id="bc-editor-favorability"></div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>外观与内在</legend>
+            <div class="form-grid">
+                <div class="form-group"><label for="bc-editor-appearance">样貌:</label><input type="text" id="bc-editor-appearance"></div>
+                <div class="form-group"><label for="bc-editor-figure">身段:</label><input type="text" id="bc-editor-figure"></div>
+                <div class="form-group"><label for="bc-editor-attire">穿着:</label><input type="text" id="bc-editor-attire"></div>
+                <div class="form-group"><label for="bc-editor-personality">性格:</label><input type="text" id="bc-editor-personality"></div>
+                <div class="form-group full-width"><label for="bc-editor-motive">内心想法:</label><input type="text" id="bc-editor-motive"></div>
+                <div class="form-group full-width"><label for="bc-editor-background">背景:</label><textarea id="bc-editor-background" rows="3"></textarea></div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>详细属性</legend>
+            <div id="bc-editor-attributes-grid" class="attribute-allocation-grid"></div>
+        </fieldset>
+    </div>
+    <button id="save-bonded-char-editor-btn" class="major-action-button" style="margin-top: 20px;">保存人物</button>
+</div>
+</div>
+
+<div id="location-rpg-overlay" class="overlay">
+<div id="location-rpg-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div class="pixel-box">
+        <h4 id="rpg-location-title">天星城</h4>
+        <div id="rpg-map-grid"></div>
+    </div>
+</div>
+</div>
+
+<div id="message-editor-overlay" class="overlay">
+<div id="message-editor-modal" class="large-editor-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>修改消息</h4>
+    <textarea id="message-editor-textarea" class="settings-section"></textarea>
+    <button id="save-message-edit-btn" class="major-action-button"><i class="fas fa-save"></i> 保存修改</button>
+</div>
+</div>
+
+<div id="snapshot-overlay" class="overlay">
+<div id="snapshot-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>人生快照</h4>
+    <div id="snapshot-list" class="modal-content"></div>
+</div>
+</div>
+
+<div id="snapshot-editor-overlay" class="overlay">
+<div id="snapshot-editor-modal" class="large-editor-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>编辑快照表格变量</h4>
+    <textarea id="snapshot-editor-textarea"></textarea>
+    <button id="save-snapshot-edit-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-save"></i> 保存修改</button>
+</div>
+</div>
+
+<div id="summary-log-overlay" class="overlay">
+<div id="summary-log-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>总结记录</h4>
+    <div class="modal-content">
+        <div id="summary-list-view"></div>
+        <div id="summary-detail-view" class="hidden"></div>
+    </div>
+</div>
+</div>
+
+<div id="summary-viewer-overlay" class="overlay">
+<div class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="summary-viewer-title"></h4>
+    <div id="summary-viewer-list" class="modal-content"></div>
+</div>
+</div>
+
+<div id="summary-editor-overlay" class="overlay">
+<div id="summary-editor-modal" class="large-editor-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="summary-editor-title"></h4>
+    <textarea id="summary-editor-textarea"></textarea>
+    <button id="save-summary-editor-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-save"></i> 保存修改</button>
+</div>
+</div>
+
+<div id="manual-segmented-memory-overlay" class="overlay">
+<div id="manual-segmented-memory-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>手动添加分段记忆</h4>
+    <p style="text-align: center; color: #b0b0b0; margin-top: -10px; margin-bottom: 20px;">为最新的AI回复补充缺失的总结信息。</p>
+    <div class="settings-section">
+        <label for="manual-small-summary">小总结 (Small Summary)</label>
+        <textarea id="manual-small-summary" rows="4"></textarea>
+    </div>
+    <div class="settings-section">
+        <label for="manual-large-summary">大总结 (Large Summary)</label>
+        <textarea id="manual-large-summary" rows="6"></textarea>
+    </div>
+    <button id="save-manual-segmented-memory-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并补充记忆</button>
+</div>
+</div>
+
+<div id="spirit-beast-overlay" class="overlay">
+<div id="spirit-beast-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div id="spirit-beast-list-view">
+        <h4>我的灵兽</h4>
+        <div id="spirit-beast-list-container"></div>
+    </div>
+    <div id="spirit-beast-detail-view" class="hidden">
+        <button id="back-to-spirit-beast-list-btn" class="major-action-button" style="margin-bottom: 15px; width: auto; align-self: flex-start;"><i class="fas fa-arrow-left"></i> 返回列表</button>
+        <div id="spirit-beast-detail-panel"></div>
+    </div>
+</div>
+</div>
+
+<div id="skills-overlay" class="overlay">
+<div id="skills-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>我的技能</h4>
+    <div id="skills-grid-container" class="skills-grid-container"></div>
+</div>
+</div>
+
+<div id="skill-detail-overlay" class="overlay">
+<div id="skill-detail-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <div class="item-detail-header">
+        <i id="skill-detail-icon" class="fas fa-bolt"></i>
+        <span id="skill-detail-name"></span>
+    </div>
+    <div id="skill-detail-content"></div>
+</div>
+</div>
+
+<div id="tasks-overlay" class="overlay">
+<div id="tasks-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>任务布告栏</h4>
+    <div id="task-bulletin-board">
+        <button id="task-prev-btn" class="task-nav-btn"><i class="fas fa-chevron-left"></i></button>
+        <button id="task-next-btn" class="task-nav-btn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+</div>
+
+<div id="branching-options-overlay" class="overlay">
+<div class="branching-options-modal modal">
+    <h4>请选择你的行动</h4>
+    <div class="modal-content"></div>
+</div>
+</div>
+
+<div class="cultivation-panel hidden">
+<div class="mobile-pane-overlay"></div>
+<div class="left-pane">
+    <div class="pane-section" id="time-location-section"><h3>天时地利</h3><div id="time-location-display"></div></div>
+    <div class="pane-section" id="character-section"><h3>个人信息</h3>
+        <div id="character-display">
+            <video id="cultivation-avatar" src="" alt="修行者法相" autoplay loop muted playsinline></video>
+            <img id="custom-avatar-img" src="" alt="自定义法相" class="hidden">
+        </div>
+    </div>
+<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 15px;">
+    <h3 style="margin: 0; padding: 0; border: none; font-size: 1.1em; color: #ffd700;">道基属性</h3>
+    <button id="player-display-settings-btn" class="control-button" title="显示设置" style="width: 26px; height: 26px; font-size: 12px;"><i class="fas fa-cog"></i></button>
+</div>
+<ul id="attributes-list"></ul>
+    <div class="pane-section" id="inventory-section"><h3>储物袋</h3><div id="inventory-grid" class="inventory-grid-container"></div></div>
+    <button id="open-command-queue-btn" class="major-action-button"><i class="fas fa-list-ul"></i> 行为指令集</button>
+</div>
+
+<div class="center-pane">
+    <div class="mobile-header">
+        <button id="mobile-toggle-left"><i class="fas fa-user-circle"></i></button>
+        <span id="mobile-header-title">凡人修仙传</span>
+        <button id="mobile-toggle-right"><i class="fas fa-bars"></i></button>
+    </div>
+    <div id="chat-view">
+        <div id="danmaku-container"></div>
+<button id="variable-diff-btn" title="查看变量变动">
+    <i class="fas fa-exchange-alt"></i>
+</button>
+<div id="variable-diff-popup" class="hidden"></div>
+<button id="thinking-log-btn" class="control-button" title="查看AI思考过程">
+    <i class="fas fa-brain"></i>
+</button>
+    <div id="thinking-log-popup" class="hidden">
+        <h5>AI 思考过程</h5>
+        <pre id="thinking-log-content"></pre>
+    </div>
+        <div id="main-content-wrapper">
+            <div id="chat-background-layer"></div>
+            <div id="main-content-area"></div>
+        </div>
+		            <div id="ai-theater-drag-ball"><i class="fas fa-mobile-alt"></i></div>
+        <div id="fab-container">
+            <div id="fab-ball"><i class="fas fa-gavel"></i></div>
+            <div id="fab-menu">
+                <div id="fab-menu-ring"></div>
+                <div class="fab-item" data-slot="0" data-action="enhance" title="强化"><i class="fas fa-hammer"></i></div>
+                <div class="fab-item" data-slot="1" data-action="alchemy" title="炼丹"><i class="fas fa-pills"></i></div>
+                <div class="fab-item" data-slot="2" data-action="refining" title="炼器"><i class="fas fa-tools"></i></div>
+                <div class="fab-item" data-slot="3" data-action="storage" title="仓库"><i class="fas fa-archive"></i></div>
+                <div class="fab-item fab-shortcut" data-slot="4" data-shortcut-index="0"><i class="fas fa-plus"></i></div>
+                <div class="fab-item fab-shortcut" data-slot="5" data-shortcut-index="1"><i class="fas fa-plus"></i></div>
+                <div class="fab-item fab-shortcut" data-slot="6" data-shortcut-index="2"><i class="fas fa-plus"></i></div>
+                <div class="fab-item fab-shortcut" data-slot="7" data-shortcut-index="3"><i class="fas fa-plus"></i></div>
+            </div>
+        </div>
+        <div id="fab-shortcut-menu" class="hidden"></div>
+        <button id="scroll-to-bottom-btn" class="control-button hidden" title="回到底部"><i class="fas fa-arrow-down"></i></button>
+        <div class="message-sender-area">
+            <button id="branch-toggle-btn"><i class="fas fa-chevron-up arrow"></i></button>
+            <button id="peek-background-btn" title="偷看背景"><i class="fas fa-eye"></i></button>
+            <textarea id="message-input" placeholder="输入你的行为或想法..."></textarea>
+            <button id="send-message-button" title="发送"><i class="fas fa-paper-plane"></i></button>
+            <span id="action-queue-indicator">!</span>
+        </div>
+    </div>
+    <div id="archive-selection-view" class="log-management-view hidden">
+        <h3>人生记录 · 存档选择</h3>
+        <div id="archive-list"></div>
+        <div class="archive-actions">
+<button id="select-all-archives-btn" class="major-action-button"><i class="fas fa-check-double"></i> 全选/全不选</button>
+<button id="delete-selected-archives-btn" class="major-action-button" disabled><i class="fas fa-trash-alt"></i> 删除选中</button>
+<button id="import-archive-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入存档（请在开始页面导入）</button>
+<button id="export-archive-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出存档</button>
+<button id="export-chat-log-btn" class="major-action-button"><i class="fas fa-file-alt"></i> 导出纯文本</button>
+<button id="create-new-archive-btn" class="major-action-button full-width"><i class="fas fa-plus-circle"></i> 创建新存档</button>
+<button id="back-to-chat-from-archives-button" class="major-action-button full-width"><i class="fas fa-arrow-left"></i> 返回</button>
+</div>
+    </div>
+    <div id="log-viewer-view" class="log-management-view hidden">
+        <div class="log-viewer-header">
+            <h3 id="log-viewer-title">查看记录</h3>
+            <div class="log-viewer-actions">
+                <button id="select-log-button" title="选择此记录"><i class="fas fa-check"></i></button>
+                <button id="rename-log-button" title="重命名"><i class="fas fa-edit"></i></button>
+                <button id="delete-log-button" title="删除此记录"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        <div class="log-viewer-content">
+            <div id="log-list"></div>
+            <div id="log-viewer-state-display">
+                <div id="log-viewer-state-content"></div>
+            </div>
+        </div>
+        <button id="back-to-archives-button" class="major-action-button"><i class="fas fa-arrow-left"></i> 返回存档列表</button>
+    </div>
+</div>
+
+<div class="right-pane">
+    <div class="panel-controls">
+        <div class="top-control-group">
+            <button id="theme-toggle-button" class="control-button" title="切换昼夜"><i class="fas fa-sun"></i></button>
+            <button id="fullscreen-btn" class="control-button" title="全屏"><i class="fas fa-expand"></i></button>
+            <div class="scale-controls">
+                <button id="scale-down-btn" class="control-button" title="缩小">-</button>
+                <button id="scale-reset-btn" class="control-button" title="重置">◎</button>
+                <button id="scale-up-btn" class="control-button" title="放大">+</button>
+            </div>
+        </div>
+        
+        <fieldset>
+            <legend><i class="fas fa-globe-asia"></i> 世界纵览</legend>
+            <button id="world-map-button" class="major-action-button"><i class="fas fa-map-marked-alt"></i> 世界地图</button>
+            <button id="surrounding-characters-button" class="major-action-button"><i class="fas fa-users"></i> 周围人物</button>
+            <button id="world-events-button" class="major-action-button"><i class="fas fa-scroll"></i> 世界大事</button>
+        </fieldset>
+
+        <fieldset>
+            <legend><i class="fas fa-paw"></i> 道法神通</legend>
+            <button id="my-spirit-beasts-btn" class="major-action-button"><i class="fas fa-dragon"></i> 我的灵兽</button>
+            <button id="my-skills-btn" class="major-action-button"><i class="fas fa-bolt"></i> 我的技能</button>
+        </fieldset>
+
+        <fieldset>
+            <legend><i class="fas fa-book-open"></i> 人生回顾</legend>
+            <button id="summary-log-button" class="major-action-button"><i class="fas fa-scroll"></i> 阅览总结</button>
+            <button id="manage-log-button" class="major-action-button"><i class="fas fa-history"></i> 人生记录</button>
+            <button id="snapshot-btn" class="major-action-button"><i class="fas fa-camera-retro"></i> 人生快照</button>
+        </fieldset>
+
+        <fieldset>
+            <legend><i class="fas fa-tasks"></i> 当前任务</legend>
+            <button id="view-tasks-btn" class="major-action-button"><i class="fas fa-tasks"></i> 查看任务</button>
+        </fieldset>
+        
+        <fieldset>
+            <legend><i class="fas fa-cogs"></i> 系统</legend>
+            <button id="system-settings-button" class="major-action-button"><i class="fas fa-cog"></i> 系统设置</button>
+            <button id="achievement-button" class="major-action-button"><i class="fas fa-trophy"></i> 成就墙</button>
+    <button id="back-to-splash-btn" class="major-action-button"><i class="fas fa-home"></i> 返回主页面</button>
+
+        </fieldset>
+		
+		<fieldset>
+                <legend><i class="fas fa-image"></i> 重新生成</legend>
+                <button id="regenerate-current-bg-btn" class="major-action-button small-font-btn"><i class="fas fa-redo-alt"></i> 当前背景重roll</button>
+				<button id="reroll-background-btn" class="major-action-button small-font-btn"><i class="fas fa-sync-alt"></i> 正文背景重roll</button>
+            <button id="reroll-thinking-btn" class="major-action-button small-font-btn"><i class="fas fa-dice"></i> 变量思考重roll</button>
+			</fieldset>
+    </div>
+</div>
+</div>
+
+<div id="character-detail-overlay" class="overlay">
+<div class="character-detail-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <div class="detail-left-pane">
+        <div id="death-counter"></div>
+        <video id="modal-avatar-img" src="" alt="法相" autoplay loop muted playsinline></video>
+        <img id="modal-custom-avatar-img" src="" alt="自定义法相" class="hidden">
+        <div id="modal-player-status"></div>
+        <button id="change-avatar-btn" class="major-action-button" style="margin-top: 10px; width: auto; padding: 5px 15px;"><i class="fas fa-image"></i> 更换形象</button>
+    </div>
+    <div class="detail-right-pane">
+        <div class="detail-section gourd-section">
+            <div class="gourd-container"><div class="gourd-css"><div class="gourd-fill" id="gourd-fill-progress"></div></div></div>
+            <div class="gourd-text"><div id="gourd-progress-text"></div></div>
+        </div>
+        <div class="detail-section"><h4><i class="fas fa-khanda"></i> 武器栏</h4><div class="grid-container" id="weapon-grid"></div></div>
+        <div class="detail-section"><h4><i class="fas fa-shield-alt"></i> 护甲栏</h4><div class="grid-container" id="armor-grid"></div></div>
+        <div class="detail-section"><h4><i class="fas fa-book-open"></i> 功法栏</h4><div class="grid-container" id="technique-grid"></div></div>
+        <div class="detail-section"><h4><i class="fas fa-gem"></i> 法宝栏</h4><div class="grid-container" id="treasure-grid"></div></div>
+        <div class="detail-separator"></div>
+        <div class="detail-section"><h4><i class="fas fa-chart-bar"></i> 详细属性</h4><div class="grid-container" id="detailed-attributes-grid"></div></div>
+        <div class="detail-section"><h4><i class="fas fa-star"></i> 先天气运</h4><div class="grid-container" id="player-traits-grid"></div></div>
+    </div>
+</div>
+</div>
+
+<div id="equipment-picker-overlay" class="overlay">
+<div class="equipment-picker-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="picker-title">选择物品</h4>
+    <div id="picker-grid"></div>
+</div>
+</div>
+
+<div id="command-queue-overlay" class="overlay">
+<div class="command-queue-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>待执行指令</h4>
+    <ul id="command-list"></ul>
+    <div class="command-buttons">
+        <button id="undo-command-btn">撤销上一条</button>
+        <button id="clear-commands-btn">清空全部</button>
+    </div>
+</div>
+</div>
+
+<div id="item-detail-overlay" class="overlay">
+<div class="item-detail-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <div class="item-detail-header">
+        <i id="item-detail-icon" class="fas"></i>
+        <span id="item-detail-name"></span>
+    </div>
+    <div class="item-detail-row">
+        <span class="item-detail-label">类型:</span>
+        <span id="item-detail-type" class="item-detail-value"></span>
+    </div>
+    <div class="item-detail-row">
+        <span class="item-detail-label">描述:</span>
+        <span id="item-detail-desc" class="item-detail-value"></span>
+    </div>
+    <div class="item-detail-row">
+        <span class="item-detail-label">效果:</span>
+        <span id="item-detail-effect" class="item-detail-value"></span>
+    </div>
+    <div id="item-detail-actions">
+        <button id="item-detail-use-btn">使用</button>
+        <button id="item-detail-replace-btn">更换</button>
+        <button id="item-detail-unequip-btn">拆卸</button>
+    </div>
+</div>
+</div>
+
+<div id="system-settings-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>系统设置</h4>
+    <button id="open-chat-background-settings-btn" class="major-action-button"><i class="fas fa-image"></i> 聊天背景设置</button>
+    <button id="open-regex-settings-btn" class="major-action-button"><i class="fas fa-magic"></i> 正文与正则设置</button>
+    <button id="open-summary-config-btn" class="major-action-button"><i class="fas fa-book-reader"></i> 总结 & 分段记忆设置</button>
+	<button id="open-thinking-api-settings-btn" class="major-action-button"><i class="fas fa-brain"></i> 变量思考API设置</button>
+
+<button id="open-image-tagging-api-settings-btn" class="major-action-button"><i class="fas fa-tags"></i> 正文优化API设置</button>
+        <button id="open-knowledge-search-api-settings-btn" class="major-action-button"><i class="fas fa-search-plus"></i> 知识库API\世界书设置</button>
+    <button id="open-attribute-alignment-btn" class="major-action-button"><i class="fas fa-balance-scale-right"></i> 属性对齐设置</button>
+<button id="open-cloud-settings-btn" class="major-action-button"><i class="fas fa-cloud"></i> 云存档设置</button>
+    <button id="open-fun-settings-btn" class="major-action-button"><i class="fas fa-grin-stars"></i> 趣味设置</button>
+<button id="open-map-editor-btn" class="major-action-button"><i class="fas fa-drafting-compass"></i> 地图设置</button>
+</div>
+</div>
+
+
+<div id="persistent-status">
+    <i id="persistent-status-icon" class="fas fa-spinner fa-spin"></i>
+    <span id="persistent-status-text"></span>
+</div>
+
+
+
+<div id="thinking-api-settings-overlay" class="overlay">
+    <div class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>变量思考 API 设置</h4>
+        <div class="modal-content">
+<!-- ... -->
+<div class="settings-section">
+    <div class="context-control-item" style="margin-bottom: 15px;">
+        <input type="checkbox" id="thinking-api-enabled-toggle">
+        <label for="thinking-api-enabled-toggle"><strong>启用独立的变量思考API</strong></label>
+    </div>
+
+    <!-- 新增的可折叠区域 -->
+    <details>
+        <summary style="cursor: pointer; color: #ffd700; list-style: none;">
+            <h5><i class="fas fa-robot"></i> API 详细配置 (点击展开/折叠)</h5>
+        </summary>
+        <div style="margin-top: 15px;">
+            <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                此API专门负责解析AI回复的剧情...
+            </p>
+            <label for="thinking-api-url">API URL (需兼容OpenAI):</label>
+            <input type="text" id="thinking-api-url" placeholder="例如: https://api.openai.com/v1">
+            
+            <label for="thinking-api-key">API Key:</label>
+            <input type="password" id="thinking-api-key" placeholder="sk-...">
+            
+            <label for="thinking-api-model">模型 (Model):</label>
+            <!-- 更改为 select -->
+            <select id="thinking-api-model"></select>
+            <!-- 新增按钮 -->
+            <button id="fetch-thinking-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
+        </div>
+    </details>
+</div>
+<div class="settings-section">
+    <h5><i class="fas fa-archive"></i> 预设管理</h5>
+    <div id="thinking-presets-list" style="margin-bottom: 15px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+        <!-- 预设列表将由JS动态生成在这里 -->
+    </div>
+    <div class="button-group" style="justify-content: flex-start; gap: 10px;">
+        <button id="create-thinking-preset-btn" class="major-action-button small-font-btn"><i class="fas fa-plus"></i> 创建预设</button>
+        <button id="import-thinking-presets-btn" class="major-action-button small-font-btn"><i class="fas fa-file-import"></i> 导入</button>
+        <button id="export-thinking-presets-btn" class="major-action-button small-font-btn"><i class="fas fa-file-export"></i> 导出</button>
+    </div>
+</div>
+
+<div class="settings-section">
+    <h5><i class="fas fa-atlas"></i> 参考世界书</h5>
+    <p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
+        在这里导入的世界书文件，其内容将被拼接并替换指令模板中的 <strong>${world_book_context}</strong> 占位符，作为变量思考的参考。
+    </p>
+    <div id="thinking-worldbook-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+    </div>
+    <div class="button-group" style="justify-content: flex-start;">
+<button id="add-thinking-worldbook-btn" class="settings-btn small-btn" title="添加一个新的空白条目"><i class="fas fa-plus"></i> 添加条目</button>
+        <button id="import-thinking-worldbook-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新世界书</button>
+    </div>
+</div>
+
+            <div class="settings-section">
+			<button id="restore-thinking-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复默认设置</button>
+                <h5><i class="fas fa-scroll"></i> 指令模板 (Prompt Template)</h5>
+                <textarea id="thinking-api-prompt-template" rows="12" placeholder="在此输入您的指令模板..."></textarea>
+                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                    您的模板中必须包含 <strong>${story_text}</strong> 占位符，它将被替换为AI回复的剧情原文。
+					<strong>${state_snapshot}</strong>占位符会被替换成快照数据。
+                </p>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="save-thinking-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+        </div>
+    </div>
+</div>
+<!-- ===== 新增结束 ===== -->
+
+<div id="attribute-alignment-overlay" class="overlay">
+<div id="attribute-alignment-modal" class="modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>属性对齐设置</h4>
+    <div class="modal-content">
+        <div class="settings-section">
+            <div class="context-control-item">
+                <input type="checkbox" id="attribute-alignment-enabled-toggle">
+                <label for="attribute-alignment-enabled-toggle">启用属性对齐</label>
+            </div>
+            <p style="font-size: 0.9em; color: #b0b0b0;">启用后，系统将根据下方规则，在每次AI回复后检查并调整玩家和NPC的属性上限。</p>
+        </div>
+        <div id="alignment-rules-container"></div>
+        <button id="add-alignment-rule-btn" class="major-action-button"><i class="fas fa-plus"></i> 新增境界规则</button>
+    </div>
+    <div class="button-group" style="margin-top: 20px;">
+        <button id="save-attribute-alignment-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+    </div>
+</div>
+</div>
+
+<div id="chat-background-settings-overlay" class="overlay">
+    <div id="chat-background-settings-modal" class="modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>聊天背景设置</h4>
+        
+        <!-- 【修复】确保所有设置项都在 .modal-content 内部 -->
+        <div class="modal-content">
+            <div class="settings-section">
+                <!-- 启用开关 -->
+                <div class="context-control-item">
+                    <input type="checkbox" id="auto-gen-background-toggle">
+                    <label for="auto-gen-background-toggle">启用AI自动生成背景图</label>
+                </div>
+
+                <!-- 可折叠的API配置区域 -->
+                <details>
+                    <summary style="cursor: pointer; color: #ffd700; list-style: none;">
+                        <h5><i class="fas fa-robot"></i> 背景图生成 API 详细配置 (点击展开/折叠)</h5>
+                    </summary>
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">启用后，每次AI回复都会尝试提取场景描述并自动请求生成背景图。</p>
+                        <label for="background-api-url">API URL (需兼容OpenAI):</label>
+                        <input type="text" id="background-api-url" placeholder="例如: https://api.openai.com/v1">
+                        <label for="background-api-key">API Key:</label>
+                        <input type="password" id="background-api-key" placeholder="sk-...">
+                        <label for="background-api-model">模型 (Model):</label>
+                        <select id="background-api-model"></select>
+                        <button id="fetch-background-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
+                        <div style="display: flex; gap: 20px; margin-top: 15px;">
+                            <div>
+                                <label for="background-api-width">宽度:</label>
+                                <input type="number" id="background-api-width" value="512">
+                            </div>
+                            <div>
+                                <label for="background-api-height">高度:</label>
+                                <input type="number" id="background-api-height" value="768">
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <label for="background-api-prompt-template">AI 提示词模板:</label>
+                            <textarea id="background-api-prompt-template" rows="8" placeholder="在此输入您的指令模板..."></textarea>
+                            <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">您的模板中必须包含 <strong>${text}</strong> 占位符，它将被替换为AI回复的剧情原文。</p>
+    <button id="restore-background-defaults-btn" class="major-action-button small-font-btn"><i class="fas fa-undo"></i> 恢复默认设置</button>         
+		 </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- 导入的背景图规则文件 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-file-code"></i> 导入的背景图规则文件</h5>
+                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
+                    在这里导入你的背景图规则文件（.json格式）。文件内容将在调用API时被插入到指令模板的 <strong>${json_context}</strong> 占位符中。
+                </p>
+                <div id="background-json-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+                    <!-- 列表由JS动态生成 -->
+                </div>
+                <div class="button-group" style="justify-content: flex-start;">
+                    <button id="import-background-json-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新文件</button>
+                </div>
+                <input type="file" id="background-json-import-input" class="hidden" accept=".json">
+            </div>
+
+            <!-- 背景调整 -->
+            <div class="settings-section">
+                <h5>背景调整</h5>
+                <div class="background-controls">
+                    <label for="bg-opacity-slider">透明度:</label>
+                    <input type="range" id="bg-opacity-slider" min="0" max="1" step="0.05">
+                    <label for="bg-blur-slider">模糊度 (px):</label>
+                    <input type="range" id="bg-blur-slider" min="0" max="20" step="1">
+                    <label for="bg-size-select">裁剪方式:</label>
+                    <select id="bg-size-select">
+                        <option value="cover">覆盖 (cover)</option>
+                        <option value="contain">包含 (contain)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 背景图库 -->
+            <div class="settings-section">
+                <h5>背景图库</h5>
+                <div id="background-thumbnail-grid"></div>
+            </div>
+            
+        </div> <!-- 【【【 核心修复点：.modal-content 的结束标签 </div> 应该在这里 】】】 -->
+
+        <!-- 【修复】按钮组应该在 .modal-content 的外面，作为 .modal 的直接子元素 -->
+        <div class="button-group">
+            <button id="ai-gen-background-btn" class="major-action-button"><i class="fas fa-magic"></i> AI 生图</button>
+            <button id="upload-background-btn" class="major-action-button"><i class="fas fa-upload"></i> 上传新背景</button>
+            <button id="batch-delete-background-btn" class="major-action-button" style="border-color: #e57373; color: #e57373;"><i class="fas fa-trash"></i> 批量删除</button>
+            <button id="save-background-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+        </div>
+        
+        <input type="file" id="background-upload-input" class="hidden" accept="image/*">
+    </div>
+</div>
+
+<div id="fun-settings-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>趣味设置</h4>
+    <div class="settings-section">
+        <h5>弹幕系统</h5>
+        <div class="context-control-item">
+            <input type="checkbox" id="danmaku-enabled-toggle">
+            <label for="danmaku-enabled-toggle">启用弹幕反馈</label>
+        </div>
+    </div>
+    <div id="danmaku-style-settings" class="settings-section">
+        <h5>弹幕样式</h5>
+        <div id="danmaku-settings-container"></div>
+    </div>
+    <div class="button-group">
+        <button id="save-fun-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+    </div>
+</div>
+</div>
+
+<div id="regex-settings-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>正文与正则设置</h4>
+    <div class="settings-section">
+        <h5>显示设置</h5>
+        <div class="font-settings-controls">
+            <label for="content-font-size">AI字体大小:</label>
+            <input type="range" id="content-font-size" min="0.8" max="1.5" step="0.05">
+            <label for="content-font-color">AI字体颜色:</label>
+            <input type="color" id="content-font-color">
+            <label for="chat-font-family">聊天字体:</label>
+            <select id="chat-font-family"></select>
+            <label for="content-render-limit">显示楼层:</label>
+            <input type="number" id="content-render-limit" min="10" placeholder="100" style="width: 80px;">
+        </div>
+    </div>
+    <div class="settings-section">
+        <h5>AI 上下文控制</h5>
+        <div class="context-control-item">
+            <label for="context-limit">发送最近消息层数:</label>
+            <input type="number" id="context-limit" min="1" placeholder="全部">
+        </div>
+        <div class="context-control-item">
+            <input type="checkbox" id="auto-hide-summarized">
+            <label for="auto-hide-summarized">自动隐藏已总结内容 (优先)</label>
+        </div>
+        <div class="context-control-item">
+            <label for="fixed-hide-range">固定隐藏范围:</label>
+            <input type="text" id="fixed-hide-range" placeholder="例如: 5-10">
+        </div>
+        <div class="context-control-item">
+            <input type="checkbox" id="enable-streaming-toggle">
+            <label for="enable-streaming-toggle">启用流式传输 </label>
+        </div>
+    </div>
+    <div class="settings-section">
+    <div class="settings-section">
+<h5><i class="fas fa-archive"></i> 正则预设</h5>
+<div id="regex-presets-list" style="margin-bottom: 15px;"></div>
+<button id="create-regex-preset-btn" class="major-action-button"><i class="fas fa-plus-circle"></i> 创建当前正则为预设</button>
+</div>
+        <h5>思维链正则 (最高优先级)</h5>
+        <div id="chain-regex-rules-list"></div>
+        <button id="add-chain-regex-rule-btn" class="major-action-button"><i class="fas fa-plus"></i> 新增思维链规则</button>
+    </div>
+    <div class="settings-section">
+        <h5>常规正则替换 (在表格和图片指令提取后运行)</h5>
+        <div id="regex-rules-list"></div>
+        <button id="add-regex-rule-btn" class="major-action-button"><i class="fas fa-plus"></i> 新增常规规则</button>
+    </div>
+    <div class="settings-section">
+        <h5>清理记录</h5>
+        <button id="delete-hidden-logs-btn" class="major-action-button" style="border-color: #e57373; color: #e57373;"><i class="fas fa-broom"></i> 删除所有已折叠/隐藏的记录</button>
+    </div>
+    <div class="button-group">
+        <button id="import-regex-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入</button>
+        <button id="export-regex-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出</button>
+        <button id="save-regex-config-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+    </div>
+    <input type="file" id="import-regex-input" class="hidden" accept=".json">
+</div>
+</div>
+
+<div id="regex-editor-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4 id="regex-editor-title">编辑规则</h4>
+    <div class="settings-section">
+        <label for="regex-editor-name">规则名称 (scriptName):</label>
+        <input type="text" id="regex-editor-name">
+        <label for="regex-editor-find">查找正则 (findRegex):</label>
+        <textarea id="regex-editor-find" rows="3" placeholder="格式: /pattern/flags"></textarea>
+        <label for="regex-editor-replace">替换为 (replaceString):</label>
+        <textarea id="regex-editor-replace" rows="2" placeholder="可使用$1, $2等捕获组"></textarea>
+    </div>
+    <div class="editor-grid">
+        <div class="editor-col">
+            <fieldset>
+<legend>作用范围 (placement)</legend>
+<label><input type="checkbox" data-placement="0"> 用户输入</label>
+<label><input type="checkbox" data-placement="2"> AI输出</label>
+<label><input type="checkbox" data-placement="4"> 世界信息</label>
+<label><input type="checkbox" data-placement="5"> Reasoning</label>
+<label><input type="checkbox" data-placement="6"> 发送的消息</label>
+            </fieldset>
+            <fieldset>
+                <legend>深度</legend>
+                <label for="regex-editor-min-depth">最小深度:</label>
+                <input type="number" id="regex-editor-min-depth" placeholder="无限">
+                <label for="regex-editor-max-depth">最大深度:</label>
+                <input type="number" id="regex-editor-max-depth" placeholder="默认8">
+            </fieldset>
+        </div>
+        <div class="editor-col">
+            <fieldset>
+                <legend>其他选项</legend>
+                <label><input type="checkbox" id="regex-editor-disabled"> 已禁用</label>
+                <label><input type="checkbox" id="regex-editor-run-on-edit"> 在编辑时运行</label>
+                <label><input type="checkbox" id="regex-editor-markdown"> 仅格式显示</label>
+                <label><input type="checkbox" id="regex-editor-prompt"> 仅格式提示词</label>
+            </fieldset>
+                <fieldset>
+                <legend>宏</legend>
+                <select id="regex-editor-substitute">
+                    <option value="0">不替换</option>
+                </select>
+            </fieldset>
+        </div>
+    </div>
+    <div class="button-group" style="margin-top: 20px;">
+        <button id="save-regex-editor-btn" class="major-action-button"><i class="fas fa-check"></i> 确认</button>
+    </div>
+</div>
+</div>
+
+<div id="summary-config-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>总结 & 分段记忆设置</h4>
+    <div class="settings-section">
+        <h5>API 源</h5>
+        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+            <label><input type="radio" name="apiSource" value="custom" checked> 自定义 API</label>
+            <label><input type="radio" name="apiSource" value="parent"> 父窗口 API</label>
+            <button id="open-segmented-memory-btn" class="major-action-button" style="margin-left: auto;"><i class="fas fa-brain"></i> 分段记忆</button>
+        </div>
+        <div id="custom-api-settings">
+            <h5>自定义 API 配置</h5>
+            <label for="summary-api-url">API URL:</label>
+            <input type="text" id="summary-api-url" placeholder="例如: https://api.openai.com/v1">
+            <label for="summary-api-key">API Key:</label>
+            <input type="password" id="summary-api-key" placeholder="sk-...">
+            <label for="summary-api-model">模型 (Model):</label>
+            <input type="text" id="summary-api-model" placeholder="例如: gpt-3.5-turbo">
+        </div>
+    </div>
+    <div class="settings-section">
+        <h5>总结提示词 (Prompt)</h5>
+        <textarea id="summary-prompt" rows="4"></textarea>
+    </div>
+    <div class="settings-section">
+        <h5>自动总结</h5>
+        <label style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="summary-auto-toggle" style="width: auto; margin: 0;">
+            <span>启用自动总结</span>
+        </label>
+        <label for="summary-auto-threshold">当未总结消息达到此层数时触发 (推荐 20-50):</label>
+        <input type="number" id="summary-auto-threshold" min="2">
+    </div>
+    <div class="settings-section">
+        <h5>手动总结</h5>
+        <button id="open-manual-summary-btn" class="major-action-button"><i class="fas fa-hand-paper"></i> 选择存档进行手动总结（需要开启预设的总结功能+暂停剧情，推荐使用分段记忆）</button>
+    </div>
+    <div class="button-group">
+        <button id="save-summary-config-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+    </div>
+</div>
+</div>
+
+<div id="segmented-memory-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>分段记忆设置</h4>
+        <div class="settings-section">
+            <h5>记忆管理</h5>
+			<div class="button-group" style="justify-content: space-around; margin-bottom: 15px;">
+
+						            <button id="export-world-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出世界</button>
+            <button id="import-world-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入世界</button>
+            </div>
+			<div class="button-group" style="justify-content: space-around; margin-bottom: 15px;">
+                <button id="export-segmented-memory-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出分段记忆</button>
+                <button id="import-segmented-memory-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入分段记忆</button>
+            </div>
+            <div class="button-group" style="justify-content: space-around;">
+                <button id="view-small-summaries-btn" class="major-action-button"><i class="fas fa-list"></i> 查看小总结</button>
+                <button id="view-large-summaries-btn" class="major-action-button"><i class="fas fa-list-alt"></i> 查看大总结</button>
+            </div>
+        </div>
+    <div class="settings-section">
+        <h5>上下文发送策略</h5>
+        <div class="context-control-item">
+            <input type="checkbox" id="segmented-memory-enabled-toggle">
+            <label for="segmented-memory-enabled-toggle">启用分段记忆</label>
+        </div>
+        <p style="font-size: 0.9em; color: #b0b0b0; margin-bottom: 15px;">启用后，将按以下规则分层发送上下文，并覆盖“AI上下文控制”中的层数限制。层数从最新的AI回复倒数计算。</p>
+        <label for="segmented-chat-layers">最新的 X 层发送完整聊天记录:</label>
+        <input type="number" id="segmented-chat-layers" min="0">
+        <label for="segmented-large-summary-start">从倒数第 Y 层开始，只发送大总结 (Y > X):</label>
+        <input type="number" id="segmented-large-summary-start" min="0">
+    </div>
+    <div class="button-group">
+        <button id="save-segmented-memory-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+    </div>
+</div>
+</div>
+
+<div id="manual-summary-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>手动总结</h4>
+    <div class="settings-section">
+        <h5>1. 选择要总结的存档</h5>
+        <div id="manual-summary-list" class="manual-summary-list"></div>
+    </div>
+    <div id="manual-summary-controls" class="settings-section hidden">
+        <h5 id="manual-summary-target-title"></h5>
+        <label for="manual-summary-count">要总结的层数 (从最早的未总结处开始):</label>
+        <input type="number" id="manual-summary-count" min="1">
+        <div class="button-group">
+            <button id="start-manual-summary-btn" class="major-action-button"><i class="fas fa-play-circle"></i> 开始总结</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="export-archive-overlay" class="overlay">
+<div class="settings-modal modal">
+    <button class="modal-close-btn">&times;</button>
+    <h4>选择要导出的存档</h4>
+    <div id="export-archive-list" class="manual-summary-list"></div>
+</div>
+</div>
+
+<div id="surrounding-characters-overlay" class="overlay">
+    <div class="characters-modal modal">
+        <button class="modal-close-btn">&times;</button>
+<div id="character-list-view">
+    <div class="characters-modal-header">
+        <div class="auto-gen-toggle-container">
+            <label for="auto-gen-npc-image-toggle" class="switch-label">自动生图</label>
+            <label class="switch">
+                <input type="checkbox" id="auto-gen-npc-image-toggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <h4>周围人物</h4>
+        <button id="npc-display-settings-btn" class="control-button" title="显示设置"><i class="fas fa-cog"></i></button>
+    </div>
+    <div id="character-list-container"></div>
+</div>
+        <div id="character-detail-view" class="hidden">
+            <button id="back-to-character-list-btn" class="major-action-button" style="margin-bottom: 15px; width: auto; align-self: flex-start;"><i class="fas fa-arrow-left"></i> 返回列表</button>
+            <div id="character-detail-panel"></div>
+        </div>
+    </div>
+</div>
+
+<div id="message-context-menu" class="hidden">
+<button id="ctx-edit-btn"><i class="fas fa-edit fa-fw"></i> 修改消息</button>
+<button id="ctx-resend-btn"><i class="fas fa-redo fa-fw"></i> 重新发送</button>
+<button id="ctx-copy-btn"><i class="fas fa-copy fa-fw"></i> 复制消息</button>
+<button id="ctx-delete-btn"><i class="fas fa-trash fa-fw"></i> 删除消息</button>
+</div>
+
+<input type="file" id="import-archive-input" class="hidden" accept=".json">
+<input type="file" id="avatar-upload-input" class="hidden" accept="image/*">
+<input type="file" id="generic-import-input" class="hidden" accept=".json">
+<input type="file" id="background-upload-input" class="hidden" accept="image/*">
+<input type="file" id="npc-avatar-upload-input" class="hidden" accept="image/*">
+<div id="map-editor-overlay" class="overlay">
+<div id="map-editor-modal" class="modal">
+<div class="map-modal-header">
+<h4>地图编辑器</h4>
+<div class="map-zoom-controls">
+<button class="map-zoom-btn" data-action="zoom-in">+</button>
+<button class="map-zoom-btn" data-action="zoom-out">-</button>
+</div>
+<div class="map-editor-actions">
+<button id="map-editor-import-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入</button>
+<button id="map-editor-export-btn" class="major-action-button"><i class="fas fa-file-export"></i> 导出</button>
+<button id="map-editor-delete-selected-btn" class="major-action-button" style="border-color: #e57373; color: #e57373;"><i class="fas fa-trash-alt"></i> 多选删除</button>
+<button id="map-editor-save-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+</div>
+<button class="modal-close-btn">&times;</button>
+</div>
+<div id="map-editor-main-view">
+<div id="map-editor-canvas-container">
+<canvas id="map-editor-canvas"></canvas>
+</div>
+<div id="map-editor-controls">
+<div id="map-editor-status">请选择一个项目进行编辑，或添加新项目。</div>
+<div class="map-editor-section">
+<details open>
+<summary>主疆域 <button class="add-map-item-btn" data-type="main_region">+</button></summary>
+<ul id="main-region-list" class="map-item-list"></ul>
+</details>
+</div>
+<div class="map-editor-section">
+<details>
+<summary>下辖区域 <button class="add-map-item-btn" data-type="sub_region">+</button></summary>
+<ul id="sub-region-list" class="map-item-list"></ul>
+</details>
+</div>
+<div class="map-editor-section">
+<details>
+<summary>兴趣点 <button class="add-map-item-btn" data-type="poi">+</button></summary>
+<ul id="poi-list" class="map-item-list"></ul>
+</details>
+</div>
+<div id="map-editor-form-container" class="hidden">
+<fieldset id="map-editor-form">
+<legend id="map-editor-form-title">编辑项目</legend>
+<input type="text" id="map-editor-name" placeholder="名称">
+<textarea id="map-editor-desc" rows="3" placeholder="描述"></textarea>
+<div id="map-editor-sub-region-selector" class="hidden">
+<label for="map-editor-parent-region">所属主疆域:</label>
+<select id="map-editor-parent-region"></select>
+</div>
+<div id="map-editor-color-picker" class="hidden">
+<label>颜色:</label>
+<div id="retro-palette-container">
+<!-- Swatches will be generated by JS -->
+</div>
+<input type="hidden" id="map-editor-color">
+</div>
+<div class="map-editor-form-actions">
+<button id="map-editor-draw-btn" class="major-action-button"><i class="fas fa-pencil-ruler"></i> 绘制坐标</button>
+<button id="map-editor-save-item-btn" class="major-action-button"><i class="fas fa-check"></i> 应用修改</button>
+<button id="map-editor-delete-item-btn" class="major-action-button" style="border-color: #e57373; color: #e57373;"><i class="fas fa-trash"></i> 删除</button>
+<button id="map-editor-cancel-btn" class="major-action-button">取消</button>
+</div>
+</fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="behavior-interaction-overlay" class="overlay">
+<div id="stacked-hand-container">
+<div class="hand-card" data-type="equipment" style="--i:0;"><span>装备</span></div>
+<div class="hand-card" data-type="inventory" style="--i:1;"><span>物品</span></div>
+<div class="hand-card" data-type="skills" style="--i:2;"><span>技能</span></div>
+<div class="hand-card" data-type="beasts" style="--i:3;"><span>灵兽</span></div>
+</div>
+
+<div id="card-library-panel" class="modal hidden">
+<button class="modal-close-btn">&times;</button>
+<h4 id="card-library-title">牌库</h4>
+<div id="card-library-grid"></div>
+</div>
+
+<div id="interaction-choice-panel" class="modal hidden">
+<h4 id="interaction-choice-title">选择行动</h4>
+<div id="interaction-choice-buttons"></div>
+</div>
+</div>
+
+<div id="error-report-overlay" class="overlay">
+<div id="error-report-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4><i class="fas fa-exclamation-triangle" style="color: #ffcc00;"></i> AI 指令解析错误报告</h4>
+<div id="error-report-content" class="modal-content" style="background: rgba(255,0,0,0.1); border: 1px solid #e57373; padding: 15px; color: #f0e6d2;">
+</div>
+</div>
+</div>
+
+<div id="npc-image-gen-overlay" class="overlay">
+    <div id="npc-image-gen-modal" class="modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4 id="npc-image-gen-title">为 [人物名] 生成形象</h4>
+        <div class="settings-section">
+            <label for="npc-gen-prompt">提示词 (Prompt):</label>
+            <textarea id="npc-gen-prompt" rows="5"></textarea>
+        </div>
+        <div class="settings-section" style="display: flex; gap: 20px;">
+            <div>
+                <label for="npc-gen-width">宽度:</label>
+                <input type="number" id="npc-gen-width" value="512">
+            </div>
+            <div>
+                <label for="npc-gen-height">高度:</label>
+                <input type="number" id="npc-gen-height" value="768">
+            </div>
+        </div>
+        <button id="npc-gen-start-btn" class="major-action-button"><i class="fas fa-magic"></i> 开始生成</button>
+        <div id="npc-gen-status" style="text-align: center; margin-top: 15px;"></div>
+    </div>
+</div>
+<div id="npc-avatar-fullscreen-overlay" class="overlay">
+<div id="npc-avatar-fullscreen-modal" class="modal" style="background: none; border: none; box-shadow: none; padding: 0;">
+<img id="npc-avatar-fullscreen-img" src="" alt="NPC Avatar" style="max-width: 90vw; max-height: 90vh; object-fit: contain; cursor: pointer;">
+</div>
+</div>
+
+<div id="splash-screen">
+<video id="splash-video-bg" src="https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1752805008624_qdqqd_3tw59r.mp4" autoplay loop muted playsinline></video>
+<div id="splash-content">
+<h1 id="splash-title">凡人修仙传</h1>
+<p id="splash-info">作者: LUCKLYJKOP | 版本: 9.36 | 沉浸式的修仙文字世界</p>
+<div id="splash-buttons">
+<button id="start-new-life-btn" class="splash-btn">开始新人生</button>
+<button id="load-life-btn" class="splash-btn">读取人生</button>
+<button id="workshop-splash-btn" class="splash-btn">创意工坊</button>
+</div>
+</div>
+<button id="splash-settings-btn" class="splash-corner-btn" title="缓存管理"><i class="fas fa-cog"></i></button>
+<button id="splash-import-btn" class="splash-corner-btn" title="导入/导出"><i class="fas fa-exchange-alt"></i></button>
+<button id="splash-refresh-btn" class="splash-corner-btn" title="刷新背景"><i class="fas fa-sync-alt"></i></button>
+<button id="splash-fullscreen-btn" class="splash-corner-btn" title="全屏"><i class="fas fa-expand"></i></button>
+</div>
+
+<div id="workshop-key-overlay" class="overlay" style="z-index: 2300;">
+<div id="workshop-key-modal" class="modal" style="max-width: 400px;">
+<button class="modal-close-btn">&times;</button>
+<h4>设置个人密钥</h4>
+<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">密钥用于识别你的作品，请妥善保管。</p>
+<div class="settings-section">
+<label for="workshop-key-input">请输入6位数字密钥:</label>
+<input type="number" id="workshop-key-input" pattern="\d{6}" maxlength="6" placeholder="例如: 123456">
+</div>
+<button id="save-workshop-key-btn" class="major-action-button">保存密钥</button>
+</div>
+</div>
+
+<div id="workshop-management-overlay" class="overlay">
+<div id="workshop-management-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>我的作品管理</h4>
+<div id="my-workshop-list">
+<p style="text-align:center; opacity:0.7;">正在查询我的作品...</p>
+</div>
+</div>
+</div>
+<div id="workshop-preview-overlay" class="overlay">
+<div id="workshop-preview-modal" class="modal" style="width: 70vw; max-width: 700px; height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4 id="workshop-preview-title">内容预览</h4>
+<div id="workshop-preview-content">
+</div>
+</div>
+</div>
+
+<div id="workshop-selection-overlay" class="overlay">
+<div id="workshop-selection-modal" class="modal" style="width: 80vw; max-width: 800px; height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4 id="workshop-selection-title">选择要上传的内容</h4>
+<div id="workshop-selection-list" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px;">
+</div>
+<div class="manager-actions" style="margin-top: 15px;">
+<button id="workshop-confirm-selection-btn" class="major-action-button">确认上传</button>
+</div>
+</div>
+</div>
+
+<div id="image-tagging-api-settings-overlay" class="overlay">
+    <div class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>正文优化生成 API 设置</h4>
+        <div class="modal-content">
+
+         
+            <div class="settings-section">
+                <!-- 保持开关在 <details> 标签外部 -->
+                <div class="context-control-item" style="margin-bottom: 15px;">
+                    <input type="checkbox" id="image-tagging-api-enabled-toggle">
+                    <label for="image-tagging-api-enabled-toggle"><strong>启用独立的正文优化生成API</strong></label>
+                </div>
+
+                <!-- 将所有可折叠内容放入 <details> -->
+                <details>
+                    <!-- <summary> 是可点击的标题区域 -->
+                    <summary style="cursor: pointer; color: #ffd700; list-style: none;">
+                        <h5><i class="fas fa-robot"></i> API 详细配置 (点击展开/折叠)</h5>
+                    </summary>
+
+                    <!-- 下面是所有需要被折叠的内容 -->
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                            启用后，系统会在主API回复后，额外调用此API来为正文插入正文优化。
+                        </p>
+                        <label for="image-tagging-api-url">API URL (需兼容OpenAI):</label>
+                        <input type="text" id="image-tagging-api-url" placeholder="例如: https://api.openai.com/v1">
+                        
+                        <label for="image-tagging-api-key">API Key:</label>
+                        <input type="password" id="image-tagging-api-key" placeholder="sk-...">
+                        
+                        <label for="image-tagging-api-model">模型 (Model):</label>
+                        <select id="image-tagging-api-model"></select>
+                        <button id="fetch-image-tagging-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
+                    </div>
+                </details>
+            </div>
+            
+            <!-- 其他 settings-section 保持不变 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-file-code"></i> 导入的JSON规则文件</h5>
+                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
+                    在这里导入你的规则文件（.json格式）。启用后，文件内容将在调用API时被插入到指令模板的顶部。
+                </p>
+                <div id="image-tagging-json-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+                    <!-- 列表由JS动态生成 -->
+                </div>
+                <div class="button-group" style="justify-content: flex-start;">
+                    <button id="import-image-tagging-json-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新文件</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h5><i class="fas fa-scroll"></i> 指令模板 (Prompt Template)</h5>
+                <textarea id="image-tagging-api-prompt-template" rows="12" placeholder="在此输入您的指令模板..."></textarea>
+				<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+					您的模板中必须包含 <strong>${json_context}</strong> 和 <strong>${story_text}</strong> 占位符。
+					<strong>${json_context}</strong>作为JSON配置文件发送。
+					<strong>${story_text}</strong> 作为剧情正文发送。
+				</p>
+    <button id="restore-tagging-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复默认设置</button>
+
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="save-image-tagging-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+        </div>
+    </div>
+</div>
+
+<div id="npc-image-gen-overlay" class="overlay"> ... </div>
+
+<!-- 主窗口 -->
+<div id="ai-theater-window">
+    <div class="ai-theater-header">
+        <span>AI 小剧场</span>
+        <div class="ai-theater-header-buttons">
+            <button id="ai-theater-config-btn" title="配置API"><i class="fas fa-cog"></i></button>
+            <button id="ai-theater-close-btn" title="关闭窗口">&times;</button>
+        </div>
+    </div>
+    <div class="ai-theater-input-area">
+        <input type="text" id="ai-prompt-input" placeholder="输入你想看的小剧场，例如：韩立获得了一件神秘法宝...">
+        <button id="ai-generate-btn">生成剧本</button>
+    </div>
+
+<div class="ai-theater-content">
+    <div id="ai-theater-placeholder">
+        <span>欢迎使用AI小剧场功能！</span>
+        <span style="font-size: 14px; color: #7a7f85; margin-top: 10px;">请在上方输入您的想法，然后点击“生成剧本”。</span>
+    </div>
+
+    <!-- Iframe：用于在成功后显示AI返回的剧本内容 -->
+    <iframe id="ai-theater-iframe"></iframe>
+</div>
+</div>
+
+<!-- id="ai-api-config-modal" 这个div是弹窗的根容器 -->
+<div id="ai-api-config-modal">
+    <!-- .ai-api-config-content 是所有内容的白色背景容器 -->
+    <div class="ai-api-config-content">
+        
+        <!-- 标题 -->
+        <h2>AI 小剧场 API 配置</h2>
+
+        <!-- Endpoint 部分 (用一个div包裹，方便布局) -->
+        <div>
+            <label for="api-endpoint-input">API Endpoint:</label>
+            <input type="text" id="api-endpoint-input">
+        </div>
+
+        <!-- API Key 部分 -->
+        <div>
+            <label for="api-key-input">API Key:</label>
+            <input type="password" id="api-key-input">
+        </div>
+
+        <!-- 模型(Model) 部分 -->
+        <div>
+            <label for="api-model-select">模型 (Model):</label>
+            <!-- 这个内部div使用flex，让下拉菜单和按钮同行显示 -->
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <select id="api-model-select" style="flex-grow: 1;"></select>
+                <button id="fetch-ai-theater-models-btn" class="major-action-button" title="获取可用模型" style="width: auto; padding: 8px 12px; height: 38px;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+		
+		<div>
+    <label for="auto-gen-theater-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+        <span>主API返回后自动生成</span>
+        <label class="switch" style="margin-bottom: 0;">
+            <input type="checkbox" id="auto-gen-theater-toggle">
+            <span class="slider round"></span>
+        </label>
+    </label>
+</div>
+<div>
+    <label for="daily-paper-mode-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+        <span>日报模式</span>
+        <label class="switch" style="margin-bottom: 0;">
+            <input type="checkbox" id="daily-paper-mode-toggle">
+            <span class="slider round"></span>
+        </label>
+    </label>
+</div>
+
+<div id="daily-paper-prompt-section" class="hidden">
+    <label for="daily-paper-prompt-template">日报提示词模板:</label>
+    <textarea id="daily-paper-prompt-template" rows="4"></textarea>
+    <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">当“日报模式”开启时，将使用此模板。</p>
+    <button id="restore-daily-paper-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复日报默认模板</button>
+
+</div>
+
+
+        <!-- 提示词模板 部分 -->
+        <div>
+            <label for="prompt-template-textarea">提示词模板:</label>
+            <textarea id="prompt-template-textarea" rows="4"></textarea>
+            <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">模板中必须包含 ${storyText} 占位符。</p>
+		    <button id="restore-theater-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复小剧场默认模板</button>
+        </div>
+
+
+        <!-- 底部按钮组 -->
+        <div class="ai-api-config-buttons">
+            <button id="ai-api-config-cancel-btn">取消</button>
+            <button id="ai-api-config-save-btn">保存</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="knowledge-search-api-settings-overlay" class="overlay">
+    <div class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>知识库API/世界书 设置</h4>
+        <div class="modal-content">
+
+            <!-- API 配置 -->
+<div class="settings-section">
+    <details>
+        <summary style="cursor: pointer; color: #ffd700; list-style: none;">
+            <h5><i class="fas fa-robot"></i> API 配置 (点击展开/折叠)</h5>
+        </summary>
+        <div style="margin-top: 15px;">
+            <label for="knowledge-search-api-url">API URL (需兼容OpenAI):</label>
+            <input type="text" id="knowledge-search-api-url" placeholder="例如: https://api.openai.com/v1">
+            
+            <label for="knowledge-search-api-key">API Key:</label>
+            <input type="password" id="knowledge-search-api-key" placeholder="sk-...">
+            
+            <label for="knowledge-search-api-model">模型 (Model):</label>
+            <select id="knowledge-search-api-model"></select>
+
+            <button id="fetch-knowledge-search-models-btn" class="major-action-button" style="width: 100%; margin-top: 15px;">
+                <i class="fas fa-sync-alt"></i> 获取可用模型
+            </button>
+        </div>
+    </details>
+</div>
+            <!-- 搜索指令模板 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-scroll"></i> 搜索指令模板 (Prompt Template)</h5>
+                <textarea id="knowledge-search-prompt-template" rows="8">你是一个信息处理专家。根据用户提出的问题，搜索并整合信息，然后严格按照以下格式输出：
+[TITLE]
+为内容起一个简洁、精确的标题。
+[KEYWORDS]
+提取3-5个最核心的关键词，使用中文关键词，用英文逗号“,”分隔。这些关键词将用于游戏内的触发关键词，例如关于韩立的事件，触发词只需要是韩立或事件内发生的事情。
+[CONTENT]
+对信息进行详细、有条理的总结，不超过500字。
+---
+用户问题：\${searchText}</textarea>
+                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                    模板中必须包含 <strong>${searchText}</strong> 占位符，它将被替换为搜索的关键词。
+                </p>
+            </div>
+
+            <!-- 搜索并填充知识库 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-search"></i> 搜索并填充知识库</h5>
+                <label for="knowledge-search-input">输入关键词进行搜索:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="knowledge-search-input" placeholder="例如: 天南大陆的历史" style="flex-grow: 1;">
+                    <button id="execute-knowledge-search-btn" class="major-action-button" style="width: auto; padding: 0 20px;"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h5><i class="fas fa-book"></i> 知识库内容 (可手动编辑)</h5>
+                <textarea id="knowledge-base-content-textarea" rows="3" placeholder="这里将显示搜索和总结后的内容，你也可以直接在此处编辑你的知识库..."></textarea>
+            </div>
+        </div>
+		
+		
+
+<!-- 世界书条目 -->
+<div class="settings-section">
+    <h5><i class="fas fa-atlas"></i> 世界书条目</h5>
+    
+    <!-- 这个按钮现在用来打开弹窗 -->
+    <button id="open-world-book-creator-btn" class="major-action-button" style="width: 100%; margin-bottom: 15px;">
+        <i class="fas fa-plus-circle"></i> 创建新世界书条目
+    </button>
+
+    <!-- 已保存的条目列表将显示在这里 -->
+    <div id="world-book-entries-list" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+        <!-- 条目将由JS动态生成 -->
+    </div>
+</div>
+
+
+
+        <!-- 底部按钮组 -->
+        <div class="button-group">
+            <button id="save-knowledge-search-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+        </div>
+    </div>
+</div>
+<input type="file" id="background-json-import-input" class="hidden" accept=".json">
+
+
+<!-- 世界书条目编辑器弹窗 (新增) -->
+<div id="world-book-editor-overlay" class="overlay">
+    <div id="world-book-editor-modal" class="modal" style="max-width: 600px;">
+        <button class="modal-close-btn">&times;</button>
+        <h4 id="world-book-editor-title">创建新世界书条目</h4>
+        
+        <div class="settings-section">
+            <label for="world-book-entry-name">条目名称 (唯一):</label>
+            <input type="text" id="world-book-entry-name" placeholder="例如：天南大陆的历史">
+        </div>
+
+        <div class="settings-section">
+            <label>触发模式:</label>
+            <div style="display: flex; gap: 20px; margin-top: 5px;">
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <input type="radio" name="worldbook-editor-trigger" value="blue" checked>
+                    <i class="fas fa-lightbulb" style="color: #4fc3f7;"></i> 蓝灯 (时刻触发)
+                </label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <input type="radio" name="worldbook-editor-trigger" value="green">
+                    <i class="fas fa-lightbulb" style="color: #66bb6a;"></i> 绿灯 (关键词触发)
+                </label>
+            </div>
+        </div>
+
+        <div id="world-book-keywords-container" class="settings-section hidden">
+            <label for="world-book-trigger-keywords">触发关键词 (用英文逗号分隔):</label>
+            <textarea id="world-book-trigger-keywords" rows="2" placeholder="例如: 天南,历史,地理"></textarea>
+        </div>
+        
+        <div class="settings-section">
+            <label for="world-book-entry-content">条目内容:</label>
+            <textarea id="world-book-entry-content" rows="8" placeholder="条目的详细内容..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button id="save-world-book-btn" class="major-action-button">保存条目</button>
+        </div>
+    </div>
+</div>
+
+<div id="world-book-group-editor-overlay" class="overlay">
+    <div class="settings-panel world-book-group-editor">
+        <h3 id="world-book-group-editor-title">管理世界书分组</h3>
+        <button class="close-btn" onclick="this.closest('.overlay').classList.remove('visible')">×</button>
+        
+        <div id="world-book-group-entry-list" class="settings-content-box entry-list-box">
+        </div>
+        
+        <div class="panel-footer">
+            <button id="delete-world-book-group-btn" class="settings-btn danger-btn">删除整个分组</button>
+            <button onclick="document.getElementById('world-book-group-editor-overlay').classList.remove('visible')" class="settings-btn">关闭</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="cloud-storage-settings-overlay" class="overlay">
+    <div id="cloud-settings-modal" class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>云存档设置</h4>
+        <div class="settings-section">
+            <div class="context-control-item">
+                <input type="checkbox" id="cloud-storage-enabled-toggle">
+                <label for="cloud-storage-enabled-toggle"><strong>启用云存档功能</strong></label>
+            </div>
+            <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                启用后，读档/存档列表将优先从云端获取。
+            </p>
+        </div>
+        <div class="settings-section">
+            <label for="cloud-storage-api-url">云服务器地址:</label>
+            <input type="text" id="cloud-storage-api-url" placeholder="例如: http://你的服务器IP地址:3000">
+        </div>
+		<button id="upload-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-upload-alt"></i> 上传全部配置</button>
+<button id="download-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-download-alt"></i> 下载全部配置</button>
+		        <div class="settings-section">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+    <p class="settings-subtitle" style="margin: 0;">
+        <i class="fas fa-cloud"></i> 云端存档列表
+    </p>
+    <div id="cloud-archive-actions">
+        <button id="refresh-cloud-archives" title="刷新列表" class="icon-button"><i class="fas fa-sync-alt"></i></button>
+        <button id="delete-cloud-archives" title="删除选中" class="icon-button danger"><i class="fas fa-trash-alt"></i></button>
+    </div>
+</div>
+            <div id="cloud-archive-list" style="max-height: 200px; overflow-y: auto;">
+            </div>
+        </div>
+				
+        <div class="button-group">
+            <button id="save-cloud-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+        </div>
+    </div>
+</div>
+
+<div id="player-display-settings-overlay" class="overlay">
+<div id="player-display-settings-modal" class="modal" style="max-width: 450px; display: flex; flex-direction: column; max-height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4>主角属性显示设置</h4>
+
+
+<div class="modal-content" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+<div class="settings-section">
+<h5>默认属性</h5>
+<div id="player-default-fields-container" class="form-grid">
+</div>
+</div>
+<div class="settings-section">
+<h5>自定义属性</h5>
+<div id="player-custom-fields-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 4px;">
+</div>
+<button id="add-player-custom-field-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-plus"></i> 添加自定义项</button>
+</div>
+</div>
+
+<div class="button-group" style="margin-top: 20px; flex-shrink: 0;">
+<button id="save-player-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
+</div>
+</div>
+</div>
+
+<div id="npc-display-settings-overlay" class="overlay">
+    <div id="npc-display-settings-modal" class="modal" style="max-width: 450px;">
+        <button class="modal-close-btn">&times;</button>
+        <h4>NPC 显示内容设置</h4>
+        <div class="settings-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-sexExperience">
+                        <span>性经验</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-sensitiveParts">
+                        <span>敏感部位</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-genitalStatus">
+                        <span>性器状态</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-eroticValue">
+                        <span>情欲值</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-pleasureValue">
+                        <span>快感值</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-publicKink">
+                        <span>表性癖</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-privateKink">
+                        <span>里性癖</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-sexualConception">
+                        <span>性观念</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-skillsTab">
+                        <span>技能页</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-traitsTab">
+                        <span>气运页</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div id="custom-fields-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #555; display: flex; flex-direction: column; gap: 10px;">
+            </div>
+        </div>
+
+        <div class="button-group" style="flex-direction: column; gap: 10px;">
+            <button id="add-custom-field-btn" class="major-action-button" style="width: 100%;"><i class="fas fa-plus"></i> 添加自定义项</button>
+            <button id="save-npc-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
+        </div>
+    </div>
+</div>
+<input type="file" id="thinking-presets-import-input" class="hidden" accept=".json">
+<input type="file" id="thinking-worldbook-input" class="hidden" accept=".json">
+<input type="file" id="image-tagging-json-import-input" class="hidden" accept=".json">
+<div id="map-management-overlay" class="overlay">
+<div id="map-management-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>全局地图管理</h4>
+<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">
+选择一个存档的地图作为默认地图。新存档将使用此地图，且“选择出生地”功能也将基于此地图。
+</p>
+<div id="map-list-container" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px; margin-bottom: 15px;">
+
+</div>
+<div class="button-group">
+<button id="set-default-map-btn" class="major-action-button" disabled><i class="fas fa-check"></i> 设为默认地图</button>
+</div>
+</div>
+</div><div id="workshop-key-overlay" class="overlay" style="z-index: 2300;">
+<div id="workshop-key-modal" class="modal" style="max-width: 400px;">
+<button class="modal-close-btn">&times;</button>
+<h4>设置个人密钥</h4>
+<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">密钥用于识别你的作品，请妥善保管。</p>
+<div class="settings-section">
+<label for="workshop-key-input">请输入6位数字密钥:</label>
+<input type="number" id="workshop-key-input" pattern="\d{6}" maxlength="6" placeholder="例如: 123456">
+</div>
+<button id="save-workshop-key-btn" class="major-action-button">保存密钥</button>
+</div>
+</div>
+
+<div id="workshop-management-overlay" class="overlay">
+<div id="workshop-management-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>我的作品管理</h4>
+<div id="my-workshop-list">
+<p style="text-align:center; opacity:0.7;">正在查询我的作品...</p>
+</div>
+</div>
+</div>
+<div id="workshop-preview-overlay" class="overlay">
+<div id="workshop-preview-modal" class="modal" style="width: 70vw; max-width: 700px; height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4 id="workshop-preview-title">内容预览</h4>
+<div id="workshop-preview-content">
+</div>
+</div>
+</div>
+
+<div id="workshop-selection-overlay" class="overlay">
+<div id="workshop-selection-modal" class="modal" style="width: 80vw; max-width: 800px; height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4 id="workshop-selection-title">选择要上传的内容</h4>
+<div id="workshop-selection-list" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px;">
+</div>
+<div class="manager-actions" style="margin-top: 15px;">
+<button id="workshop-confirm-selection-btn" class="major-action-button">确认上传</button>
+</div>
+</div>
+</div>
+
+<div id="image-tagging-api-settings-overlay" class="overlay">
+    <div class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>正文优化生成 API 设置</h4>
+        <div class="modal-content">
+
+         
+            <div class="settings-section">
+                <!-- 保持开关在 <details> 标签外部 -->
+                <div class="context-control-item" style="margin-bottom: 15px;">
+                    <input type="checkbox" id="image-tagging-api-enabled-toggle">
+                    <label for="image-tagging-api-enabled-toggle"><strong>启用独立的正文优化生成API</strong></label>
+                </div>
+
+                <!-- 将所有可折叠内容放入 <details> -->
+                <details>
+                    <!-- <summary> 是可点击的标题区域 -->
+                    <summary style="cursor: pointer; color: #ffd700; list-style: none;">
+                        <h5><i class="fas fa-robot"></i> API 详细配置 (点击展开/折叠)</h5>
+                    </summary>
+
+                    <!-- 下面是所有需要被折叠的内容 -->
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                            启用后，系统会在主API回复后，额外调用此API来为正文插入正文优化。
+                        </p>
+                        <label for="image-tagging-api-url">API URL (需兼容OpenAI):</label>
+                        <input type="text" id="image-tagging-api-url" placeholder="例如: https://api.openai.com/v1">
+                        
+                        <label for="image-tagging-api-key">API Key:</label>
+                        <input type="password" id="image-tagging-api-key" placeholder="sk-...">
+                        
+                        <label for="image-tagging-api-model">模型 (Model):</label>
+                        <select id="image-tagging-api-model"></select>
+                        <button id="fetch-image-tagging-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
+                    </div>
+                </details>
+            </div>
+            
+            <!-- 其他 settings-section 保持不变 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-file-code"></i> 导入的JSON规则文件</h5>
+                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
+                    在这里导入你的规则文件（.json格式）。启用后，文件内容将在调用API时被插入到指令模板的顶部。
+                </p>
+                <div id="image-tagging-json-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+                    <!-- 列表由JS动态生成 -->
+                </div>
+                <div class="button-group" style="justify-content: flex-start;">
+                    <button id="import-image-tagging-json-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新文件</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h5><i class="fas fa-scroll"></i> 指令模板 (Prompt Template)</h5>
+                <textarea id="image-tagging-api-prompt-template" rows="12" placeholder="在此输入您的指令模板..."></textarea>
+				<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+					您的模板中必须包含 <strong>${json_context}</strong> 和 <strong>${story_text}</strong> 占位符。
+					<strong>${json_context}</strong>作为JSON配置文件发送。
+					<strong>${story_text}</strong> 作为剧情正文发送。
+				</p>
+    <button id="restore-tagging-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复默认设置</button>
+
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="save-image-tagging-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+        </div>
+    </div>
+</div>
+
+<div id="npc-image-gen-overlay" class="overlay"> ... </div>
+
+<!-- 主窗口 -->
+<div id="ai-theater-window">
+    <div class="ai-theater-header">
+        <span>AI 小剧场</span>
+        <div class="ai-theater-header-buttons">
+            <button id="ai-theater-config-btn" title="配置API"><i class="fas fa-cog"></i></button>
+            <button id="ai-theater-close-btn" title="关闭窗口">&times;</button>
+        </div>
+    </div>
+    <div class="ai-theater-input-area">
+        <input type="text" id="ai-prompt-input" placeholder="输入你想看的小剧场，例如：韩立获得了一件神秘法宝...">
+        <button id="ai-generate-btn">生成剧本</button>
+    </div>
+
+<div class="ai-theater-content">
+    <div id="ai-theater-placeholder">
+        <span>欢迎使用AI小剧场功能！</span>
+        <span style="font-size: 14px; color: #7a7f85; margin-top: 10px;">请在上方输入您的想法，然后点击“生成剧本”。</span>
+    </div>
+
+    <!-- Iframe：用于在成功后显示AI返回的剧本内容 -->
+    <iframe id="ai-theater-iframe"></iframe>
+</div>
+</div>
+
+<!-- id="ai-api-config-modal" 这个div是弹窗的根容器 -->
+<div id="ai-api-config-modal">
+    <!-- .ai-api-config-content 是所有内容的白色背景容器 -->
+    <div class="ai-api-config-content">
+        
+        <!-- 标题 -->
+        <h2>AI 小剧场 API 配置</h2>
+
+        <!-- Endpoint 部分 (用一个div包裹，方便布局) -->
+        <div>
+            <label for="api-endpoint-input">API Endpoint:</label>
+            <input type="text" id="api-endpoint-input">
+        </div>
+
+        <!-- API Key 部分 -->
+        <div>
+            <label for="api-key-input">API Key:</label>
+            <input type="password" id="api-key-input">
+        </div>
+
+        <!-- 模型(Model) 部分 -->
+        <div>
+            <label for="api-model-select">模型 (Model):</label>
+            <!-- 这个内部div使用flex，让下拉菜单和按钮同行显示 -->
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <select id="api-model-select" style="flex-grow: 1;"></select>
+                <button id="fetch-ai-theater-models-btn" class="major-action-button" title="获取可用模型" style="width: auto; padding: 8px 12px; height: 38px;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+		
+		<div>
+    <label for="auto-gen-theater-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+        <span>主API返回后自动生成</span>
+        <label class="switch" style="margin-bottom: 0;">
+            <input type="checkbox" id="auto-gen-theater-toggle">
+            <span class="slider round"></span>
+        </label>
+    </label>
+</div>
+<div>
+    <label for="daily-paper-mode-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+        <span>日报模式</span>
+        <label class="switch" style="margin-bottom: 0;">
+            <input type="checkbox" id="daily-paper-mode-toggle">
+            <span class="slider round"></span>
+        </label>
+    </label>
+</div>
+
+<div id="daily-paper-prompt-section" class="hidden">
+    <label for="daily-paper-prompt-template">日报提示词模板:</label>
+    <textarea id="daily-paper-prompt-template" rows="4"></textarea>
+    <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">当“日报模式”开启时，将使用此模板。</p>
+    <button id="restore-daily-paper-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复日报默认模板</button>
+
+</div>
+
+
+        <!-- 提示词模板 部分 -->
+        <div>
+            <label for="prompt-template-textarea">提示词模板:</label>
+            <textarea id="prompt-template-textarea" rows="4"></textarea>
+            <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">模板中必须包含 ${storyText} 占位符。</p>
+		    <button id="restore-theater-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复小剧场默认模板</button>
+        </div>
+
+
+        <!-- 底部按钮组 -->
+        <div class="ai-api-config-buttons">
+            <button id="ai-api-config-cancel-btn">取消</button>
+            <button id="ai-api-config-save-btn">保存</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="knowledge-search-api-settings-overlay" class="overlay">
+    <div class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>知识库API/世界书 设置</h4>
+        <div class="modal-content">
+
+            <!-- API 配置 -->
+<div class="settings-section">
+    <details>
+        <summary style="cursor: pointer; color: #ffd700; list-style: none;">
+            <h5><i class="fas fa-robot"></i> API 配置 (点击展开/折叠)</h5>
+        </summary>
+        <div style="margin-top: 15px;">
+            <label for="knowledge-search-api-url">API URL (需兼容OpenAI):</label>
+            <input type="text" id="knowledge-search-api-url" placeholder="例如: https://api.openai.com/v1">
+            
+            <label for="knowledge-search-api-key">API Key:</label>
+            <input type="password" id="knowledge-search-api-key" placeholder="sk-...">
+            
+            <label for="knowledge-search-api-model">模型 (Model):</label>
+            <select id="knowledge-search-api-model"></select>
+
+            <button id="fetch-knowledge-search-models-btn" class="major-action-button" style="width: 100%; margin-top: 15px;">
+                <i class="fas fa-sync-alt"></i> 获取可用模型
+            </button>
+        </div>
+    </details>
+</div>
+            <!-- 搜索指令模板 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-scroll"></i> 搜索指令模板 (Prompt Template)</h5>
+                <textarea id="knowledge-search-prompt-template" rows="8">你是一个信息处理专家。根据用户提出的问题，搜索并整合信息，然后严格按照以下格式输出：
+[TITLE]
+为内容起一个简洁、精确的标题。
+[KEYWORDS]
+提取3-5个最核心的关键词，使用中文关键词，用英文逗号“,”分隔。这些关键词将用于游戏内的触发关键词，例如关于韩立的事件，触发词只需要是韩立或事件内发生的事情。
+[CONTENT]
+对信息进行详细、有条理的总结，不超过500字。
+---
+用户问题：\${searchText}</textarea>
+                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                    模板中必须包含 <strong>${searchText}</strong> 占位符，它将被替换为搜索的关键词。
+                </p>
+            </div>
+
+            <!-- 搜索并填充知识库 -->
+            <div class="settings-section">
+                <h5><i class="fas fa-search"></i> 搜索并填充知识库</h5>
+                <label for="knowledge-search-input">输入关键词进行搜索:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="knowledge-search-input" placeholder="例如: 天南大陆的历史" style="flex-grow: 1;">
+                    <button id="execute-knowledge-search-btn" class="major-action-button" style="width: auto; padding: 0 20px;"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h5><i class="fas fa-book"></i> 知识库内容 (可手动编辑)</h5>
+                <textarea id="knowledge-base-content-textarea" rows="3" placeholder="这里将显示搜索和总结后的内容，你也可以直接在此处编辑你的知识库..."></textarea>
+            </div>
+        </div>
+		
+		
+
+<!-- 世界书条目 -->
+<div class="settings-section">
+    <h5><i class="fas fa-atlas"></i> 世界书条目</h5>
+    
+    <!-- 这个按钮现在用来打开弹窗 -->
+    <button id="open-world-book-creator-btn" class="major-action-button" style="width: 100%; margin-bottom: 15px;">
+        <i class="fas fa-plus-circle"></i> 创建新世界书条目
+    </button>
+
+    <!-- 已保存的条目列表将显示在这里 -->
+    <div id="world-book-entries-list" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
+        <!-- 条目将由JS动态生成 -->
+    </div>
+</div>
+
+
+
+        <!-- 底部按钮组 -->
+        <div class="button-group">
+            <button id="save-knowledge-search-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+        </div>
+    </div>
+</div>
+<input type="file" id="background-json-import-input" class="hidden" accept=".json">
+
+
+<!-- 世界书条目编辑器弹窗 (新增) -->
+<div id="world-book-editor-overlay" class="overlay">
+    <div id="world-book-editor-modal" class="modal" style="max-width: 600px;">
+        <button class="modal-close-btn">&times;</button>
+        <h4 id="world-book-editor-title">创建新世界书条目</h4>
+        
+        <div class="settings-section">
+            <label for="world-book-entry-name">条目名称 (唯一):</label>
+            <input type="text" id="world-book-entry-name" placeholder="例如：天南大陆的历史">
+        </div>
+
+        <div class="settings-section">
+            <label>触发模式:</label>
+            <div style="display: flex; gap: 20px; margin-top: 5px;">
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <input type="radio" name="worldbook-editor-trigger" value="blue" checked>
+                    <i class="fas fa-lightbulb" style="color: #4fc3f7;"></i> 蓝灯 (时刻触发)
+                </label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <input type="radio" name="worldbook-editor-trigger" value="green">
+                    <i class="fas fa-lightbulb" style="color: #66bb6a;"></i> 绿灯 (关键词触发)
+                </label>
+            </div>
+        </div>
+
+        <div id="world-book-keywords-container" class="settings-section hidden">
+            <label for="world-book-trigger-keywords">触发关键词 (用英文逗号分隔):</label>
+            <textarea id="world-book-trigger-keywords" rows="2" placeholder="例如: 天南,历史,地理"></textarea>
+        </div>
+        
+        <div class="settings-section">
+            <label for="world-book-entry-content">条目内容:</label>
+            <textarea id="world-book-entry-content" rows="8" placeholder="条目的详细内容..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button id="save-world-book-btn" class="major-action-button">保存条目</button>
+        </div>
+    </div>
+</div>
+
+<div id="world-book-group-editor-overlay" class="overlay">
+    <div class="settings-panel world-book-group-editor">
+        <h3 id="world-book-group-editor-title">管理世界书分组</h3>
+        <button class="close-btn" onclick="this.closest('.overlay').classList.remove('visible')">×</button>
+        
+        <div id="world-book-group-entry-list" class="settings-content-box entry-list-box">
+        </div>
+        
+        <div class="panel-footer">
+            <button id="delete-world-book-group-btn" class="settings-btn danger-btn">删除整个分组</button>
+            <button onclick="document.getElementById('world-book-group-editor-overlay').classList.remove('visible')" class="settings-btn">关闭</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="cloud-storage-settings-overlay" class="overlay">
+    <div id="cloud-settings-modal" class="settings-modal modal">
+        <button class="modal-close-btn">&times;</button>
+        <h4>云存档设置</h4>
+        <div class="settings-section">
+            <div class="context-control-item">
+                <input type="checkbox" id="cloud-storage-enabled-toggle">
+                <label for="cloud-storage-enabled-toggle"><strong>启用云存档功能</strong></label>
+            </div>
+            <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+                启用后，读档/存档列表将优先从云端获取。
+            </p>
+        </div>
+        <div class="settings-section">
+            <label for="cloud-storage-api-url">云服务器地址:</label>
+            <input type="text" id="cloud-storage-api-url" placeholder="例如: http://你的服务器IP地址:3000">
+        </div>
+		<button id="upload-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-upload-alt"></i> 上传全部配置</button>
+<button id="download-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-download-alt"></i> 下载全部配置</button>
+		        <div class="settings-section">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+    <p class="settings-subtitle" style="margin: 0;">
+        <i class="fas fa-cloud"></i> 云端存档列表
+    </p>
+    <div id="cloud-archive-actions">
+        <button id="refresh-cloud-archives" title="刷新列表" class="icon-button"><i class="fas fa-sync-alt"></i></button>
+        <button id="delete-cloud-archives" title="删除选中" class="icon-button danger"><i class="fas fa-trash-alt"></i></button>
+    </div>
+</div>
+            <div id="cloud-archive-list" style="max-height: 200px; overflow-y: auto;">
+            </div>
+        </div>
+				
+        <div class="button-group">
+            <button id="save-cloud-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+        </div>
+    </div>
+</div>
+
+<div id="player-display-settings-overlay" class="overlay">
+<div id="player-display-settings-modal" class="modal" style="max-width: 450px; display: flex; flex-direction: column; max-height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4>主角属性显示设置</h4>
+
+
+<div class="modal-content" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+<div class="settings-section">
+<h5>默认属性</h5>
+<div id="player-default-fields-container" class="form-grid">
+</div>
+</div>
+<div class="settings-section">
+<h5>自定义属性</h5>
+<div id="player-custom-fields-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 4px;">
+</div>
+<button id="add-player-custom-field-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-plus"></i> 添加自定义项</button>
+</div>
+</div>
+
+<div class="button-group" style="margin-top: 20px; flex-shrink: 0;">
+<button id="save-player-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
+</div>
+</div>
+</div>
+
+<div id="npc-display-settings-overlay" class="overlay">
+    <div id="npc-display-settings-modal" class="modal" style="max-width: 450px;">
+        <button class="modal-close-btn">&times;</button>
+        <h4>NPC 显示内容设置</h4>
+        <div class="settings-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-sexExperience">
+                        <span>性经验</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-sensitiveParts">
+                        <span>敏感部位</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-genitalStatus">
+                        <span>性器状态</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-eroticValue">
+                        <span>情欲值</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-pleasureValue">
+                        <span>快感值</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-publicKink">
+                        <span>表性癖</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-privateKink">
+                        <span>里性癖</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-sexualConception">
+                        <span>性观念</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-skillsTab">
+                        <span>技能页</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="context-control-item">
+                        <input type="checkbox" id="toggle-traitsTab">
+                        <span>气运页</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div id="custom-fields-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #555; display: flex; flex-direction: column; gap: 10px;">
+            </div>
+        </div>
+
+        <div class="button-group" style="flex-direction: column; gap: 10px;">
+            <button id="add-custom-field-btn" class="major-action-button" style="width: 100%;"><i class="fas fa-plus"></i> 添加自定义项</button>
+            <button id="save-npc-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
+        </div>
+    </div>
+</div>
+<input type="file" id="thinking-presets-import-input" class="hidden" accept=".json">
+<input type="file" id="thinking-worldbook-input" class="hidden" accept=".json">
+<input type="file" id="image-tagging-json-import-input" class="hidden" accept=".json">
+<div id="map-management-overlay" class="overlay">
+<div id="map-management-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>全局地图管理</h4>
+<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">
+选择一个存档的地图作为默认地图。新存档将使用此地图，且“选择出生地”功能也将基于此地图。
+</p>
+<div id="map-list-container" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px; margin-bottom: 15px;">
+
+</div>
+<div class="button-group">
+<button id="set-default-map-btn" class="major-action-button" disabled><i class="fas fa-check"></i> 设为默认地图</button>
+</div>
+</div>
+</div>
+<script src="script.js"></script>
+
+</body>
+</html>
+```
