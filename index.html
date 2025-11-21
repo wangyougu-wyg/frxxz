@@ -1806,48 +1806,328 @@
 </div>
 
 <div id="npc-image-gen-overlay" class="overlay">
-    <div id="npc-image-gen-modal" class="modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4 id="npc-image-gen-title">为 [人物名] 生成形象</h4>
-        <div class="settings-section">
-            <label for="npc-gen-prompt">提示词 (Prompt):</label>
-            <textarea id="npc-gen-prompt" rows="5"></textarea>
-        </div>
-        <div class="settings-section" style="display: flex; gap: 20px;">
-            <div>
-                <label for="npc-gen-width">宽度:</label>
-                <input type="number" id="npc-gen-width" value="512">
-            </div>
-            <div>
-                <label for="npc-gen-height">高度:</label>
-                <input type="number" id="npc-gen-height" value="768">
-            </div>
-        </div>
-        <button id="npc-gen-start-btn" class="major-action-button"><i class="fas fa-magic"></i> 开始生成</button>
-        <div id="npc-gen-status" style="text-align: center; margin-top: 15px;"></div>
-    </div>
+<div id="npc-image-gen-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4 id="npc-image-gen-title">为 [人物名] 生成形象</h4>
+<div class="settings-section">
+<label for="npc-gen-prompt">提示词 (Prompt):</label>
+<textarea id="npc-gen-prompt" rows="5"></textarea>
 </div>
+<div class="settings-section" style="display: flex; gap: 20px;">
+<div>
+<label for="npc-gen-width">宽度:</label>
+<input type="number" id="npc-gen-width" value="512">
+</div>
+<div>
+<label for="npc-gen-height">高度:</label>
+<input type="number" id="npc-gen-height" value="768">
+</div>
+</div>
+<button id="npc-gen-start-btn" class="major-action-button"><i class="fas fa-magic"></i> 开始生成</button>
+<div id="npc-gen-status" style="text-align: center; margin-top: 15px;"></div>
+</div>
+</div>
+
 <div id="npc-avatar-fullscreen-overlay" class="overlay">
 <div id="npc-avatar-fullscreen-modal" class="modal" style="background: none; border: none; box-shadow: none; padding: 0;">
 <img id="npc-avatar-fullscreen-img" src="" alt="NPC Avatar" style="max-width: 90vw; max-height: 90vh; object-fit: contain; cursor: pointer;">
 </div>
 </div>
 
-<div id="splash-screen">
-<video id="splash-video-bg" src="https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1752805008624_qdqqd_3tw59r.mp4" autoplay loop muted playsinline></video>
-<div id="splash-content">
-<h1 id="splash-title">凡人修仙传</h1>
-<p id="splash-info">作者: LUCKLYJKOP | 版本: 9.36 | 沉浸式的修仙文字世界</p>
-<div id="splash-buttons">
-<button id="start-new-life-btn" class="splash-btn">开始新人生</button>
-<button id="load-life-btn" class="splash-btn">读取人生</button>
-<button id="workshop-splash-btn" class="splash-btn">创意工坊</button>
+<!-- 主窗口 -->
+<div id="ai-theater-window">
+<div class="ai-theater-header">
+<span>AI 小剧场</span>
+<div class="ai-theater-header-buttons">
+<button id="ai-theater-config-btn" title="配置API"><i class="fas fa-cog"></i></button>
+<button id="ai-theater-close-btn" title="关闭窗口">&times;</button>
 </div>
 </div>
-<button id="splash-settings-btn" class="splash-corner-btn" title="缓存管理"><i class="fas fa-cog"></i></button>
-<button id="splash-import-btn" class="splash-corner-btn" title="导入/导出"><i class="fas fa-exchange-alt"></i></button>
-<button id="splash-refresh-btn" class="splash-corner-btn" title="刷新背景"><i class="fas fa-sync-alt"></i></button>
-<button id="splash-fullscreen-btn" class="splash-corner-btn" title="全屏"><i class="fas fa-expand"></i></button>
+<div class="ai-theater-input-area">
+<input type="text" id="ai-prompt-input" placeholder="输入你想看的小剧场，例如：韩立获得了一件神秘法宝...">
+<button id="ai-generate-btn">生成剧本</button>
+</div>
+
+<div class="ai-theater-content">
+<div id="ai-theater-placeholder">
+<span>欢迎使用AI小剧场功能！</span>
+<span style="font-size: 14px; color: #7a7f85; margin-top: 10px;">请在上方输入您的想法，然后点击“生成剧本”。</span>
+</div>
+<iframe id="ai-theater-iframe"></iframe>
+</div>
+</div>
+
+<!-- AI API 配置弹窗 -->
+<div id="ai-api-config-modal">
+<div class="ai-api-config-content">
+<h2>AI 小剧场 API 配置</h2>
+<div>
+<label for="api-endpoint-input">API Endpoint:</label>
+<input type="text" id="api-endpoint-input">
+</div>
+<div>
+<label for="api-key-input">API Key:</label>
+<input type="password" id="api-key-input">
+</div>
+<div>
+<label for="api-model-select">模型 (Model):</label>
+<div style="display: flex; gap: 10px; align-items: center;">
+<select id="api-model-select" style="flex-grow: 1;"></select>
+<button id="fetch-ai-theater-models-btn" class="major-action-button" title="获取可用模型" style="width: auto; padding: 8px 12px; height: 38px;">
+<i class="fas fa-sync-alt"></i>
+</button>
+</div>
+</div>
+<div>
+<label for="auto-gen-theater-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+<span>主API返回后自动生成</span>
+<label class="switch" style="margin-bottom: 0;">
+<input type="checkbox" id="auto-gen-theater-toggle">
+<span class="slider round"></span>
+</label>
+</label>
+</div>
+<div>
+<label for="daily-paper-mode-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+<span>日报模式</span>
+<label class="switch" style="margin-bottom: 0;">
+<input type="checkbox" id="daily-paper-mode-toggle">
+<span class="slider round"></span>
+</label>
+</label>
+</div>
+<div id="daily-paper-prompt-section" class="hidden">
+<label for="daily-paper-prompt-template">日报提示词模板:</label>
+<textarea id="daily-paper-prompt-template" rows="4"></textarea>
+<p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">当“日报模式”开启时，将使用此模板。</p>
+<button id="restore-daily-paper-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复日报默认模板</button>
+</div>
+<div>
+<label for="prompt-template-textarea">提示词模板:</label>
+<textarea id="prompt-template-textarea" rows="4"></textarea>
+<p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">模板中必须包含 ${storyText} 占位符。</p>
+<button id="restore-theater-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复小剧场默认模板</button>
+</div>
+<div class="ai-api-config-buttons">
+<button id="ai-api-config-cancel-btn">取消</button>
+<button id="ai-api-config-save-btn">保存</button>
+</div>
+</div>
+</div>
+
+<!-- 知识库API设置弹窗 -->
+<div id="knowledge-search-api-settings-overlay" class="overlay">
+<div class="settings-modal modal">
+<button class="modal-close-btn">&times;</button>
+<h4>知识库API/世界书 设置</h4>
+<div class="modal-content">
+<div class="settings-section">
+<details>
+<summary style="cursor: pointer; color: #ffd700; list-style: none;">
+<h5><i class="fas fa-robot"></i> API 配置 (点击展开/折叠)</h5>
+</summary>
+<div style="margin-top: 15px;">
+<label for="knowledge-search-api-url">API URL (需兼容OpenAI):</label>
+<input type="text" id="knowledge-search-api-url" placeholder="例如: https://api.openai.com/v1">
+<label for="knowledge-search-api-key">API Key:</label>
+<input type="password" id="knowledge-search-api-key" placeholder="sk-...">
+<label for="knowledge-search-api-model">模型 (Model):</label>
+<select id="knowledge-search-api-model"></select>
+<button id="fetch-knowledge-search-models-btn" class="major-action-button" style="width: 100%; margin-top: 15px;">
+<i class="fas fa-sync-alt"></i> 获取可用模型
+</button>
+</div>
+</details>
+</div>
+<div class="settings-section">
+<h5><i class="fas fa-scroll"></i> 搜索指令模板 (Prompt Template)</h5>
+<textarea id="knowledge-search-prompt-template" rows="8">你是一个信息处理专家。根据用户提出的问题，搜索并整合信息，然后严格按照以下格式输出：
+[TITLE]
+为内容起一个简洁、精确的标题。
+[KEYWORDS]
+提取3-5个最核心的关键词，使用中文关键词，用英文逗号“,”分隔。这些关键词将用于游戏内的触发关键词，例如关于韩立的事件，触发词只需要是韩立或事件内发生的事情。
+[CONTENT]
+对信息进行详细、有条理的总结，不超过500字。
+---
+用户问题：\${searchText}</textarea>
+<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+模板中必须包含 <strong>${searchText}</strong> 占位符，它将被替换为搜索的关键词。
+</p>
+</div>
+<div class="settings-section">
+<h5><i class="fas fa-search"></i> 搜索并填充知识库</h5>
+<label for="knowledge-search-input">输入关键词进行搜索:</label>
+<div style="display: flex; gap: 10px;">
+<input type="text" id="knowledge-search-input" placeholder="例如: 天南大陆的历史" style="flex-grow: 1;">
+<button id="execute-knowledge-search-btn" class="major-action-button" style="width: auto; padding: 0 20px;"><i class="fas fa-search"></i> 搜索</button>
+</div>
+</div>
+<div class="settings-section">
+<h5><i class="fas fa-book"></i> 知识库内容 (可手动编辑)</h5>
+<textarea id="knowledge-base-content-textarea" rows="3" placeholder="这里将显示搜索和总结后的内容，你也可以直接在此处编辑你的知识库..."></textarea>
+</div>
+<div class="settings-section">
+<h5><i class="fas fa-atlas"></i> 世界书条目</h5>
+<button id="open-world-book-creator-btn" class="major-action-button" style="width: 100%; margin-bottom: 15px;">
+<i class="fas fa-plus-circle"></i> 创建新世界书条目
+</button>
+<div id="world-book-entries-list" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;"></div>
+</div>
+</div>
+<div class="button-group">
+<button id="save-knowledge-search-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
+</div>
+</div>
+</div>
+
+<!-- 世界书条目编辑器弹窗 -->
+<div id="world-book-editor-overlay" class="overlay">
+<div id="world-book-editor-modal" class="modal" style="max-width: 600px;">
+<button class="modal-close-btn">&times;</button>
+<h4 id="world-book-editor-title">创建新世界书条目</h4>
+<div class="settings-section">
+<label for="world-book-entry-name">条目名称 (唯一):</label>
+<input type="text" id="world-book-entry-name" placeholder="例如：天南大陆的历史">
+</div>
+<div class="settings-section">
+<label>触发模式:</label>
+<div style="display: flex; gap: 20px; margin-top: 5px;">
+<label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+<input type="radio" name="worldbook-editor-trigger" value="blue" checked>
+<i class="fas fa-lightbulb" style="color: #4fc3f7;"></i> 蓝灯 (时刻触发)
+</label>
+<label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+<input type="radio" name="worldbook-editor-trigger" value="green">
+<i class="fas fa-lightbulb" style="color: #66bb6a;"></i> 绿灯 (关键词触发)
+</label>
+</div>
+</div>
+<div id="world-book-keywords-container" class="settings-section hidden">
+<label for="world-book-trigger-keywords">触发关键词 (用英文逗号分隔):</label>
+<textarea id="world-book-trigger-keywords" rows="2" placeholder="例如: 天南,历史,地理"></textarea>
+</div>
+<div class="settings-section">
+<label for="world-book-entry-content">条目内容:</label>
+<textarea id="world-book-entry-content" rows="8" placeholder="条目的详细内容..."></textarea>
+</div>
+<div class="button-group">
+<button id="save-world-book-btn" class="major-action-button">保存条目</button>
+</div>
+</div>
+</div>
+
+<div id="world-book-group-editor-overlay" class="overlay">
+<div class="settings-panel world-book-group-editor">
+<h3 id="world-book-group-editor-title">管理世界书分组</h3>
+<button class="close-btn" onclick="this.closest('.overlay').classList.remove('visible')">×</button>
+<div id="world-book-group-entry-list" class="settings-content-box entry-list-box"></div>
+<div class="panel-footer">
+<button id="delete-world-book-group-btn" class="settings-btn danger-btn">删除整个分组</button>
+<button onclick="document.getElementById('world-book-group-editor-overlay').classList.remove('visible')" class="settings-btn">关闭</button>
+</div>
+</div>
+</div>
+
+<div id="cloud-storage-settings-overlay" class="overlay">
+<div id="cloud-settings-modal" class="settings-modal modal">
+<button class="modal-close-btn">&times;</button>
+<h4>云存档设置</h4>
+<div class="settings-section">
+<div class="context-control-item">
+<input type="checkbox" id="cloud-storage-enabled-toggle">
+<label for="cloud-storage-enabled-toggle"><strong>启用云存档功能</strong></label>
+</div>
+<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+启用后，读档/存档列表将优先从云端获取。
+</p>
+</div>
+<div class="settings-section">
+<label for="cloud-storage-api-url">云服务器地址:</label>
+<input type="text" id="cloud-storage-api-url" placeholder="例如: http://你的服务器IP地址:3000">
+</div>
+<button id="upload-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-upload-alt"></i> 上传全部配置</button>
+<button id="download-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-download-alt"></i> 下载全部配置</button>
+<div class="settings-section">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+<p class="settings-subtitle" style="margin: 0;">
+<i class="fas fa-cloud"></i> 云端存档列表
+</p>
+<div id="cloud-archive-actions">
+<button id="refresh-cloud-archives" title="刷新列表" class="icon-button"><i class="fas fa-sync-alt"></i></button>
+<button id="delete-cloud-archives" title="删除选中" class="icon-button danger"><i class="fas fa-trash-alt"></i></button>
+</div>
+</div>
+<div id="cloud-archive-list" style="max-height: 200px; overflow-y: auto;"></div>
+</div>
+<div class="button-group">
+<button id="save-cloud-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
+</div>
+</div>
+</div>
+
+<div id="player-display-settings-overlay" class="overlay">
+<div id="player-display-settings-modal" class="modal" style="max-width: 450px; display: flex; flex-direction: column; max-height: 70vh;">
+<button class="modal-close-btn">&times;</button>
+<h4>主角属性显示设置</h4>
+<div class="modal-content" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+<div class="settings-section">
+<h5>默认属性</h5>
+<div id="player-default-fields-container" class="form-grid"></div>
+</div>
+<div class="settings-section">
+<h5>自定义属性</h5>
+<div id="player-custom-fields-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 4px;"></div>
+<button id="add-player-custom-field-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-plus"></i> 添加自定义项</button>
+</div>
+</div>
+<div class="button-group" style="margin-top: 20px; flex-shrink: 0;">
+<button id="save-player-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
+</div>
+</div>
+</div>
+
+<div id="npc-display-settings-overlay" class="overlay">
+<div id="npc-display-settings-modal" class="modal" style="max-width: 450px;">
+<button class="modal-close-btn">&times;</button>
+<h4>NPC 显示内容设置</h4>
+<div class="settings-section">
+<div class="form-grid">
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-sexExperience"><span>性经验</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-sensitiveParts"><span>敏感部位</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-genitalStatus"><span>性器状态</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-eroticValue"><span>情欲值</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-pleasureValue"><span>快感值</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-publicKink"><span>表性癖</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-privateKink"><span>里性癖</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-sexualConception"><span>性观念</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-skillsTab"><span>技能页</span></label></div>
+<div class="form-group"><label class="context-control-item"><input type="checkbox" id="toggle-traitsTab"><span>气运页</span></label></div>
+</div>
+<div id="custom-fields-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #555; display: flex; flex-direction: column; gap: 10px;"></div>
+</div>
+<div class="button-group" style="flex-direction: column; gap: 10px;">
+<button id="add-custom-field-btn" class="major-action-button" style="width: 100%;"><i class="fas fa-plus"></i> 添加自定义项</button>
+<button id="save-npc-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
+</div>
+</div>
+</div>
+
+<input type="file" id="thinking-presets-import-input" class="hidden" accept=".json">
+<input type="file" id="thinking-worldbook-input" class="hidden" accept=".json">
+<input type="file" id="image-tagging-json-import-input" class="hidden" accept=".json">
+
+<div id="map-management-overlay" class="overlay">
+<div id="map-management-modal" class="modal">
+<button class="modal-close-btn">&times;</button>
+<h4>全局地图管理</h4>
+<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">
+选择一个存档的地图作为默认地图。新存档将使用此地图，且“选择出生地”功能也将基于此地图。
+</p>
+<div id="map-list-container" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px; margin-bottom: 15px;"></div>
+<div class="button-group">
+<button id="set-default-map-btn" class="major-action-button" disabled><i class="fas fa-check"></i> 设为默认地图</button>
+</div>
+</div>
 </div>
 
 <div id="workshop-key-overlay" class="overlay" style="z-index: 2300;">
@@ -1872,12 +2152,12 @@
 </div>
 </div>
 </div>
+
 <div id="workshop-preview-overlay" class="overlay">
 <div id="workshop-preview-modal" class="modal" style="width: 70vw; max-width: 700px; height: 70vh;">
 <button class="modal-close-btn">&times;</button>
 <h4 id="workshop-preview-title">内容预览</h4>
-<div id="workshop-preview-content">
-</div>
+<div id="workshop-preview-content"></div>
 </div>
 </div>
 
@@ -1885,8 +2165,7 @@
 <div id="workshop-selection-modal" class="modal" style="width: 80vw; max-width: 800px; height: 70vh;">
 <button class="modal-close-btn">&times;</button>
 <h4 id="workshop-selection-title">选择要上传的内容</h4>
-<div id="workshop-selection-list" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px;">
-</div>
+<div id="workshop-selection-list" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px;"></div>
 <div class="manager-actions" style="margin-top: 15px;">
 <button id="workshop-confirm-selection-btn" class="major-action-button">确认上传</button>
 </div>
@@ -1894,1015 +2173,59 @@
 </div>
 
 <div id="image-tagging-api-settings-overlay" class="overlay">
-    <div class="settings-modal modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4>正文优化生成 API 设置</h4>
-        <div class="modal-content">
-
-         
-            <div class="settings-section">
-                <!-- 保持开关在 <details> 标签外部 -->
-                <div class="context-control-item" style="margin-bottom: 15px;">
-                    <input type="checkbox" id="image-tagging-api-enabled-toggle">
-                    <label for="image-tagging-api-enabled-toggle"><strong>启用独立的正文优化生成API</strong></label>
-                </div>
-
-                <!-- 将所有可折叠内容放入 <details> -->
-                <details>
-                    <!-- <summary> 是可点击的标题区域 -->
-                    <summary style="cursor: pointer; color: #ffd700; list-style: none;">
-                        <h5><i class="fas fa-robot"></i> API 详细配置 (点击展开/折叠)</h5>
-                    </summary>
-
-                    <!-- 下面是所有需要被折叠的内容 -->
-                    <div style="margin-top: 15px;">
-                        <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-                            启用后，系统会在主API回复后，额外调用此API来为正文插入正文优化。
-                        </p>
-                        <label for="image-tagging-api-url">API URL (需兼容OpenAI):</label>
-                        <input type="text" id="image-tagging-api-url" placeholder="例如: https://api.openai.com/v1">
-                        
-                        <label for="image-tagging-api-key">API Key:</label>
-                        <input type="password" id="image-tagging-api-key" placeholder="sk-...">
-                        
-                        <label for="image-tagging-api-model">模型 (Model):</label>
-                        <select id="image-tagging-api-model"></select>
-                        <button id="fetch-image-tagging-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
-                    </div>
-                </details>
-            </div>
-            
-            <!-- 其他 settings-section 保持不变 -->
-            <div class="settings-section">
-                <h5><i class="fas fa-file-code"></i> 导入的JSON规则文件</h5>
-                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
-                    在这里导入你的规则文件（.json格式）。启用后，文件内容将在调用API时被插入到指令模板的顶部。
-                </p>
-                <div id="image-tagging-json-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
-                    <!-- 列表由JS动态生成 -->
-                </div>
-                <div class="button-group" style="justify-content: flex-start;">
-                    <button id="import-image-tagging-json-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新文件</button>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h5><i class="fas fa-scroll"></i> 指令模板 (Prompt Template)</h5>
-                <textarea id="image-tagging-api-prompt-template" rows="12" placeholder="在此输入您的指令模板..."></textarea>
-				<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-					您的模板中必须包含 <strong>${json_context}</strong> 和 <strong>${story_text}</strong> 占位符。
-					<strong>${json_context}</strong>作为JSON配置文件发送。
-					<strong>${story_text}</strong> 作为剧情正文发送。
-				</p>
-    <button id="restore-tagging-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复默认设置</button>
-
-            </div>
-        </div>
-        <div class="button-group">
-            <button id="save-image-tagging-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
-        </div>
-    </div>
-</div>
-
-<div id="npc-image-gen-overlay" class="overlay"> ... </div>
-
-<!-- 主窗口 -->
-<div id="ai-theater-window">
-    <div class="ai-theater-header">
-        <span>AI 小剧场</span>
-        <div class="ai-theater-header-buttons">
-            <button id="ai-theater-config-btn" title="配置API"><i class="fas fa-cog"></i></button>
-            <button id="ai-theater-close-btn" title="关闭窗口">&times;</button>
-        </div>
-    </div>
-    <div class="ai-theater-input-area">
-        <input type="text" id="ai-prompt-input" placeholder="输入你想看的小剧场，例如：韩立获得了一件神秘法宝...">
-        <button id="ai-generate-btn">生成剧本</button>
-    </div>
-
-<div class="ai-theater-content">
-    <div id="ai-theater-placeholder">
-        <span>欢迎使用AI小剧场功能！</span>
-        <span style="font-size: 14px; color: #7a7f85; margin-top: 10px;">请在上方输入您的想法，然后点击“生成剧本”。</span>
-    </div>
-
-    <!-- Iframe：用于在成功后显示AI返回的剧本内容 -->
-    <iframe id="ai-theater-iframe"></iframe>
-</div>
-</div>
-
-<!-- id="ai-api-config-modal" 这个div是弹窗的根容器 -->
-<div id="ai-api-config-modal">
-    <!-- .ai-api-config-content 是所有内容的白色背景容器 -->
-    <div class="ai-api-config-content">
-        
-        <!-- 标题 -->
-        <h2>AI 小剧场 API 配置</h2>
-
-        <!-- Endpoint 部分 (用一个div包裹，方便布局) -->
-        <div>
-            <label for="api-endpoint-input">API Endpoint:</label>
-            <input type="text" id="api-endpoint-input">
-        </div>
-
-        <!-- API Key 部分 -->
-        <div>
-            <label for="api-key-input">API Key:</label>
-            <input type="password" id="api-key-input">
-        </div>
-
-        <!-- 模型(Model) 部分 -->
-        <div>
-            <label for="api-model-select">模型 (Model):</label>
-            <!-- 这个内部div使用flex，让下拉菜单和按钮同行显示 -->
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <select id="api-model-select" style="flex-grow: 1;"></select>
-                <button id="fetch-ai-theater-models-btn" class="major-action-button" title="获取可用模型" style="width: auto; padding: 8px 12px; height: 38px;">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </div>
-		
-		<div>
-    <label for="auto-gen-theater-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-        <span>主API返回后自动生成</span>
-        <label class="switch" style="margin-bottom: 0;">
-            <input type="checkbox" id="auto-gen-theater-toggle">
-            <span class="slider round"></span>
-        </label>
-    </label>
-</div>
-<div>
-    <label for="daily-paper-mode-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-        <span>日报模式</span>
-        <label class="switch" style="margin-bottom: 0;">
-            <input type="checkbox" id="daily-paper-mode-toggle">
-            <span class="slider round"></span>
-        </label>
-    </label>
-</div>
-
-<div id="daily-paper-prompt-section" class="hidden">
-    <label for="daily-paper-prompt-template">日报提示词模板:</label>
-    <textarea id="daily-paper-prompt-template" rows="4"></textarea>
-    <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">当“日报模式”开启时，将使用此模板。</p>
-    <button id="restore-daily-paper-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复日报默认模板</button>
-
-</div>
-
-
-        <!-- 提示词模板 部分 -->
-        <div>
-            <label for="prompt-template-textarea">提示词模板:</label>
-            <textarea id="prompt-template-textarea" rows="4"></textarea>
-            <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">模板中必须包含 ${storyText} 占位符。</p>
-		    <button id="restore-theater-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复小剧场默认模板</button>
-        </div>
-
-
-        <!-- 底部按钮组 -->
-        <div class="ai-api-config-buttons">
-            <button id="ai-api-config-cancel-btn">取消</button>
-            <button id="ai-api-config-save-btn">保存</button>
-        </div>
-
-    </div>
-</div>
-
-<div id="knowledge-search-api-settings-overlay" class="overlay">
-    <div class="settings-modal modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4>知识库API/世界书 设置</h4>
-        <div class="modal-content">
-
-            <!-- API 配置 -->
-<div class="settings-section">
-    <details>
-        <summary style="cursor: pointer; color: #ffd700; list-style: none;">
-            <h5><i class="fas fa-robot"></i> API 配置 (点击展开/折叠)</h5>
-        </summary>
-        <div style="margin-top: 15px;">
-            <label for="knowledge-search-api-url">API URL (需兼容OpenAI):</label>
-            <input type="text" id="knowledge-search-api-url" placeholder="例如: https://api.openai.com/v1">
-            
-            <label for="knowledge-search-api-key">API Key:</label>
-            <input type="password" id="knowledge-search-api-key" placeholder="sk-...">
-            
-            <label for="knowledge-search-api-model">模型 (Model):</label>
-            <select id="knowledge-search-api-model"></select>
-
-            <button id="fetch-knowledge-search-models-btn" class="major-action-button" style="width: 100%; margin-top: 15px;">
-                <i class="fas fa-sync-alt"></i> 获取可用模型
-            </button>
-        </div>
-    </details>
-</div>
-            <!-- 搜索指令模板 -->
-            <div class="settings-section">
-                <h5><i class="fas fa-scroll"></i> 搜索指令模板 (Prompt Template)</h5>
-                <textarea id="knowledge-search-prompt-template" rows="8">你是一个信息处理专家。根据用户提出的问题，搜索并整合信息，然后严格按照以下格式输出：
-[TITLE]
-为内容起一个简洁、精确的标题。
-[KEYWORDS]
-提取3-5个最核心的关键词，使用中文关键词，用英文逗号“,”分隔。这些关键词将用于游戏内的触发关键词，例如关于韩立的事件，触发词只需要是韩立或事件内发生的事情。
-[CONTENT]
-对信息进行详细、有条理的总结，不超过500字。
----
-用户问题：\${searchText}</textarea>
-                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-                    模板中必须包含 <strong>${searchText}</strong> 占位符，它将被替换为搜索的关键词。
-                </p>
-            </div>
-
-            <!-- 搜索并填充知识库 -->
-            <div class="settings-section">
-                <h5><i class="fas fa-search"></i> 搜索并填充知识库</h5>
-                <label for="knowledge-search-input">输入关键词进行搜索:</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="knowledge-search-input" placeholder="例如: 天南大陆的历史" style="flex-grow: 1;">
-                    <button id="execute-knowledge-search-btn" class="major-action-button" style="width: auto; padding: 0 20px;"><i class="fas fa-search"></i> 搜索</button>
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h5><i class="fas fa-book"></i> 知识库内容 (可手动编辑)</h5>
-                <textarea id="knowledge-base-content-textarea" rows="3" placeholder="这里将显示搜索和总结后的内容，你也可以直接在此处编辑你的知识库..."></textarea>
-            </div>
-        </div>
-		
-		
-
-<!-- 世界书条目 -->
-<div class="settings-section">
-    <h5><i class="fas fa-atlas"></i> 世界书条目</h5>
-    
-    <!-- 这个按钮现在用来打开弹窗 -->
-    <button id="open-world-book-creator-btn" class="major-action-button" style="width: 100%; margin-bottom: 15px;">
-        <i class="fas fa-plus-circle"></i> 创建新世界书条目
-    </button>
-
-    <!-- 已保存的条目列表将显示在这里 -->
-    <div id="world-book-entries-list" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
-        <!-- 条目将由JS动态生成 -->
-    </div>
-</div>
-
-
-
-        <!-- 底部按钮组 -->
-        <div class="button-group">
-            <button id="save-knowledge-search-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
-        </div>
-    </div>
-</div>
-<input type="file" id="background-json-import-input" class="hidden" accept=".json">
-
-
-<!-- 世界书条目编辑器弹窗 (新增) -->
-<div id="world-book-editor-overlay" class="overlay">
-    <div id="world-book-editor-modal" class="modal" style="max-width: 600px;">
-        <button class="modal-close-btn">&times;</button>
-        <h4 id="world-book-editor-title">创建新世界书条目</h4>
-        
-        <div class="settings-section">
-            <label for="world-book-entry-name">条目名称 (唯一):</label>
-            <input type="text" id="world-book-entry-name" placeholder="例如：天南大陆的历史">
-        </div>
-
-        <div class="settings-section">
-            <label>触发模式:</label>
-            <div style="display: flex; gap: 20px; margin-top: 5px;">
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                    <input type="radio" name="worldbook-editor-trigger" value="blue" checked>
-                    <i class="fas fa-lightbulb" style="color: #4fc3f7;"></i> 蓝灯 (时刻触发)
-                </label>
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                    <input type="radio" name="worldbook-editor-trigger" value="green">
-                    <i class="fas fa-lightbulb" style="color: #66bb6a;"></i> 绿灯 (关键词触发)
-                </label>
-            </div>
-        </div>
-
-        <div id="world-book-keywords-container" class="settings-section hidden">
-            <label for="world-book-trigger-keywords">触发关键词 (用英文逗号分隔):</label>
-            <textarea id="world-book-trigger-keywords" rows="2" placeholder="例如: 天南,历史,地理"></textarea>
-        </div>
-        
-        <div class="settings-section">
-            <label for="world-book-entry-content">条目内容:</label>
-            <textarea id="world-book-entry-content" rows="8" placeholder="条目的详细内容..."></textarea>
-        </div>
-
-        <div class="button-group">
-            <button id="save-world-book-btn" class="major-action-button">保存条目</button>
-        </div>
-    </div>
-</div>
-
-<div id="world-book-group-editor-overlay" class="overlay">
-    <div class="settings-panel world-book-group-editor">
-        <h3 id="world-book-group-editor-title">管理世界书分组</h3>
-        <button class="close-btn" onclick="this.closest('.overlay').classList.remove('visible')">×</button>
-        
-        <div id="world-book-group-entry-list" class="settings-content-box entry-list-box">
-        </div>
-        
-        <div class="panel-footer">
-            <button id="delete-world-book-group-btn" class="settings-btn danger-btn">删除整个分组</button>
-            <button onclick="document.getElementById('world-book-group-editor-overlay').classList.remove('visible')" class="settings-btn">关闭</button>
-        </div>
-    </div>
-</div>
-
-
-<div id="cloud-storage-settings-overlay" class="overlay">
-    <div id="cloud-settings-modal" class="settings-modal modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4>云存档设置</h4>
-        <div class="settings-section">
-            <div class="context-control-item">
-                <input type="checkbox" id="cloud-storage-enabled-toggle">
-                <label for="cloud-storage-enabled-toggle"><strong>启用云存档功能</strong></label>
-            </div>
-            <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-                启用后，读档/存档列表将优先从云端获取。
-            </p>
-        </div>
-        <div class="settings-section">
-            <label for="cloud-storage-api-url">云服务器地址:</label>
-            <input type="text" id="cloud-storage-api-url" placeholder="例如: http://你的服务器IP地址:3000">
-        </div>
-		<button id="upload-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-upload-alt"></i> 上传全部配置</button>
-<button id="download-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-download-alt"></i> 下载全部配置</button>
-		        <div class="settings-section">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-    <p class="settings-subtitle" style="margin: 0;">
-        <i class="fas fa-cloud"></i> 云端存档列表
-    </p>
-    <div id="cloud-archive-actions">
-        <button id="refresh-cloud-archives" title="刷新列表" class="icon-button"><i class="fas fa-sync-alt"></i></button>
-        <button id="delete-cloud-archives" title="删除选中" class="icon-button danger"><i class="fas fa-trash-alt"></i></button>
-    </div>
-</div>
-            <div id="cloud-archive-list" style="max-height: 200px; overflow-y: auto;">
-            </div>
-        </div>
-				
-        <div class="button-group">
-            <button id="save-cloud-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
-        </div>
-    </div>
-</div>
-
-<div id="player-display-settings-overlay" class="overlay">
-<div id="player-display-settings-modal" class="modal" style="max-width: 450px; display: flex; flex-direction: column; max-height: 70vh;">
+<div class="settings-modal modal">
 <button class="modal-close-btn">&times;</button>
-<h4>主角属性显示设置</h4>
-
-
-<div class="modal-content" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+<h4>正文优化生成 API 设置</h4>
+<div class="modal-content">
 <div class="settings-section">
-<h5>默认属性</h5>
-<div id="player-default-fields-container" class="form-grid">
+<div class="context-control-item" style="margin-bottom: 15px;">
+<input type="checkbox" id="image-tagging-api-enabled-toggle">
+<label for="image-tagging-api-enabled-toggle"><strong>启用独立的正文优化生成API</strong></label>
 </div>
-</div>
-<div class="settings-section">
-<h5>自定义属性</h5>
-<div id="player-custom-fields-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 4px;">
-</div>
-<button id="add-player-custom-field-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-plus"></i> 添加自定义项</button>
-</div>
-</div>
-
-<div class="button-group" style="margin-top: 20px; flex-shrink: 0;">
-<button id="save-player-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
-</div>
-</div>
-</div>
-
-<div id="npc-display-settings-overlay" class="overlay">
-    <div id="npc-display-settings-modal" class="modal" style="max-width: 450px;">
-        <button class="modal-close-btn">&times;</button>
-        <h4>NPC 显示内容设置</h4>
-        <div class="settings-section">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-sexExperience">
-                        <span>性经验</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-sensitiveParts">
-                        <span>敏感部位</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-genitalStatus">
-                        <span>性器状态</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-eroticValue">
-                        <span>情欲值</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-pleasureValue">
-                        <span>快感值</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-publicKink">
-                        <span>表性癖</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-privateKink">
-                        <span>里性癖</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-sexualConception">
-                        <span>性观念</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-skillsTab">
-                        <span>技能页</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-traitsTab">
-                        <span>气运页</span>
-                    </label>
-                </div>
-            </div>
-            
-            <div id="custom-fields-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #555; display: flex; flex-direction: column; gap: 10px;">
-            </div>
-        </div>
-
-        <div class="button-group" style="flex-direction: column; gap: 10px;">
-            <button id="add-custom-field-btn" class="major-action-button" style="width: 100%;"><i class="fas fa-plus"></i> 添加自定义项</button>
-            <button id="save-npc-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
-        </div>
-    </div>
-</div>
-<input type="file" id="thinking-presets-import-input" class="hidden" accept=".json">
-<input type="file" id="thinking-worldbook-input" class="hidden" accept=".json">
-<input type="file" id="image-tagging-json-import-input" class="hidden" accept=".json">
-<div id="map-management-overlay" class="overlay">
-<div id="map-management-modal" class="modal">
-<button class="modal-close-btn">&times;</button>
-<h4>全局地图管理</h4>
-<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">
-选择一个存档的地图作为默认地图。新存档将使用此地图，且“选择出生地”功能也将基于此地图。
+<details>
+<summary style="cursor: pointer; color: #ffd700; list-style: none;">
+<h5><i class="fas fa-robot"></i> API 详细配置 (点击展开/折叠)</h5>
+</summary>
+<div style="margin-top: 15px;">
+<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+启用后，系统会在主API回复后，额外调用此API来为正文插入正文优化。
 </p>
-<div id="map-list-container" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px; margin-bottom: 15px;">
-
+<label for="image-tagging-api-url">API URL (需兼容OpenAI):</label>
+<input type="text" id="image-tagging-api-url" placeholder="例如: https://api.openai.com/v1">
+<label for="image-tagging-api-key">API Key:</label>
+<input type="password" id="image-tagging-api-key" placeholder="sk-...">
+<label for="image-tagging-api-model">模型 (Model):</label>
+<select id="image-tagging-api-model"></select>
+<button id="fetch-image-tagging-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
+</div>
+</details>
+</div>
+<div class="settings-section">
+<h5><i class="fas fa-file-code"></i> 导入的JSON规则文件</h5>
+<p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
+在这里导入你的规则文件（.json格式）。启用后，文件内容将在调用API时被插入到指令模板的顶部。
+</p>
+<div id="image-tagging-json-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;"></div>
+<div class="button-group" style="justify-content: flex-start;">
+<button id="import-image-tagging-json-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新文件</button>
+</div>
+</div>
+<div class="settings-section">
+<h5><i class="fas fa-scroll"></i> 指令模板 (Prompt Template)</h5>
+<textarea id="image-tagging-api-prompt-template" rows="12" placeholder="在此输入您的指令模板..."></textarea>
+<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
+您的模板中必须包含 <strong>${json_context}</strong> 和 <strong>${story_text}</strong> 占位符。
+</p>
+<button id="restore-tagging-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复默认设置</button>
+</div>
 </div>
 <div class="button-group">
-<button id="set-default-map-btn" class="major-action-button" disabled><i class="fas fa-check"></i> 设为默认地图</button>
-</div>
-</div>
-</div><div id="workshop-key-overlay" class="overlay" style="z-index: 2300;">
-<div id="workshop-key-modal" class="modal" style="max-width: 400px;">
-<button class="modal-close-btn">&times;</button>
-<h4>设置个人密钥</h4>
-<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">密钥用于识别你的作品，请妥善保管。</p>
-<div class="settings-section">
-<label for="workshop-key-input">请输入6位数字密钥:</label>
-<input type="number" id="workshop-key-input" pattern="\d{6}" maxlength="6" placeholder="例如: 123456">
-</div>
-<button id="save-workshop-key-btn" class="major-action-button">保存密钥</button>
-</div>
-</div>
-
-<div id="workshop-management-overlay" class="overlay">
-<div id="workshop-management-modal" class="modal">
-<button class="modal-close-btn">&times;</button>
-<h4>我的作品管理</h4>
-<div id="my-workshop-list">
-<p style="text-align:center; opacity:0.7;">正在查询我的作品...</p>
-</div>
-</div>
-</div>
-<div id="workshop-preview-overlay" class="overlay">
-<div id="workshop-preview-modal" class="modal" style="width: 70vw; max-width: 700px; height: 70vh;">
-<button class="modal-close-btn">&times;</button>
-<h4 id="workshop-preview-title">内容预览</h4>
-<div id="workshop-preview-content">
+<button id="save-image-tagging-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
 </div>
 </div>
 </div>
 
-<div id="workshop-selection-overlay" class="overlay">
-<div id="workshop-selection-modal" class="modal" style="width: 80vw; max-width: 800px; height: 70vh;">
-<button class="modal-close-btn">&times;</button>
-<h4 id="workshop-selection-title">选择要上传的内容</h4>
-<div id="workshop-selection-list" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px;">
-</div>
-<div class="manager-actions" style="margin-top: 15px;">
-<button id="workshop-confirm-selection-btn" class="major-action-button">确认上传</button>
-</div>
-</div>
-</div>
-
-<div id="image-tagging-api-settings-overlay" class="overlay">
-    <div class="settings-modal modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4>正文优化生成 API 设置</h4>
-        <div class="modal-content">
-
-         
-            <div class="settings-section">
-                <!-- 保持开关在 <details> 标签外部 -->
-                <div class="context-control-item" style="margin-bottom: 15px;">
-                    <input type="checkbox" id="image-tagging-api-enabled-toggle">
-                    <label for="image-tagging-api-enabled-toggle"><strong>启用独立的正文优化生成API</strong></label>
-                </div>
-
-                <!-- 将所有可折叠内容放入 <details> -->
-                <details>
-                    <!-- <summary> 是可点击的标题区域 -->
-                    <summary style="cursor: pointer; color: #ffd700; list-style: none;">
-                        <h5><i class="fas fa-robot"></i> API 详细配置 (点击展开/折叠)</h5>
-                    </summary>
-
-                    <!-- 下面是所有需要被折叠的内容 -->
-                    <div style="margin-top: 15px;">
-                        <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-                            启用后，系统会在主API回复后，额外调用此API来为正文插入正文优化。
-                        </p>
-                        <label for="image-tagging-api-url">API URL (需兼容OpenAI):</label>
-                        <input type="text" id="image-tagging-api-url" placeholder="例如: https://api.openai.com/v1">
-                        
-                        <label for="image-tagging-api-key">API Key:</label>
-                        <input type="password" id="image-tagging-api-key" placeholder="sk-...">
-                        
-                        <label for="image-tagging-api-model">模型 (Model):</label>
-                        <select id="image-tagging-api-model"></select>
-                        <button id="fetch-image-tagging-models-btn" class="major-action-button" style="margin-top: 10px;"><i class="fas fa-sync-alt"></i> 获取可用模型</button>
-                    </div>
-                </details>
-            </div>
-            
-            <!-- 其他 settings-section 保持不变 -->
-            <div class="settings-section">
-                <h5><i class="fas fa-file-code"></i> 导入的JSON规则文件</h5>
-                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: -10px; margin-bottom: 15px;">
-                    在这里导入你的规则文件（.json格式）。启用后，文件内容将在调用API时被插入到指令模板的顶部。
-                </p>
-                <div id="image-tagging-json-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
-                    <!-- 列表由JS动态生成 -->
-                </div>
-                <div class="button-group" style="justify-content: flex-start;">
-                    <button id="import-image-tagging-json-btn" class="major-action-button"><i class="fas fa-file-import"></i> 导入新文件</button>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h5><i class="fas fa-scroll"></i> 指令模板 (Prompt Template)</h5>
-                <textarea id="image-tagging-api-prompt-template" rows="12" placeholder="在此输入您的指令模板..."></textarea>
-				<p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-					您的模板中必须包含 <strong>${json_context}</strong> 和 <strong>${story_text}</strong> 占位符。
-					<strong>${json_context}</strong>作为JSON配置文件发送。
-					<strong>${story_text}</strong> 作为剧情正文发送。
-				</p>
-    <button id="restore-tagging-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复默认设置</button>
-
-            </div>
-        </div>
-        <div class="button-group">
-            <button id="save-image-tagging-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
-        </div>
-    </div>
-</div>
-
-<div id="npc-image-gen-overlay" class="overlay"> ... </div>
-
-<!-- 主窗口 -->
-<div id="ai-theater-window">
-    <div class="ai-theater-header">
-        <span>AI 小剧场</span>
-        <div class="ai-theater-header-buttons">
-            <button id="ai-theater-config-btn" title="配置API"><i class="fas fa-cog"></i></button>
-            <button id="ai-theater-close-btn" title="关闭窗口">&times;</button>
-        </div>
-    </div>
-    <div class="ai-theater-input-area">
-        <input type="text" id="ai-prompt-input" placeholder="输入你想看的小剧场，例如：韩立获得了一件神秘法宝...">
-        <button id="ai-generate-btn">生成剧本</button>
-    </div>
-
-<div class="ai-theater-content">
-    <div id="ai-theater-placeholder">
-        <span>欢迎使用AI小剧场功能！</span>
-        <span style="font-size: 14px; color: #7a7f85; margin-top: 10px;">请在上方输入您的想法，然后点击“生成剧本”。</span>
-    </div>
-
-    <!-- Iframe：用于在成功后显示AI返回的剧本内容 -->
-    <iframe id="ai-theater-iframe"></iframe>
-</div>
-</div>
-
-<!-- id="ai-api-config-modal" 这个div是弹窗的根容器 -->
-<div id="ai-api-config-modal">
-    <!-- .ai-api-config-content 是所有内容的白色背景容器 -->
-    <div class="ai-api-config-content">
-        
-        <!-- 标题 -->
-        <h2>AI 小剧场 API 配置</h2>
-
-        <!-- Endpoint 部分 (用一个div包裹，方便布局) -->
-        <div>
-            <label for="api-endpoint-input">API Endpoint:</label>
-            <input type="text" id="api-endpoint-input">
-        </div>
-
-        <!-- API Key 部分 -->
-        <div>
-            <label for="api-key-input">API Key:</label>
-            <input type="password" id="api-key-input">
-        </div>
-
-        <!-- 模型(Model) 部分 -->
-        <div>
-            <label for="api-model-select">模型 (Model):</label>
-            <!-- 这个内部div使用flex，让下拉菜单和按钮同行显示 -->
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <select id="api-model-select" style="flex-grow: 1;"></select>
-                <button id="fetch-ai-theater-models-btn" class="major-action-button" title="获取可用模型" style="width: auto; padding: 8px 12px; height: 38px;">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </div>
-		
-		<div>
-    <label for="auto-gen-theater-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-        <span>主API返回后自动生成</span>
-        <label class="switch" style="margin-bottom: 0;">
-            <input type="checkbox" id="auto-gen-theater-toggle">
-            <span class="slider round"></span>
-        </label>
-    </label>
-</div>
-<div>
-    <label for="daily-paper-mode-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-        <span>日报模式</span>
-        <label class="switch" style="margin-bottom: 0;">
-            <input type="checkbox" id="daily-paper-mode-toggle">
-            <span class="slider round"></span>
-        </label>
-    </label>
-</div>
-
-<div id="daily-paper-prompt-section" class="hidden">
-    <label for="daily-paper-prompt-template">日报提示词模板:</label>
-    <textarea id="daily-paper-prompt-template" rows="4"></textarea>
-    <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">当“日报模式”开启时，将使用此模板。</p>
-    <button id="restore-daily-paper-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复日报默认模板</button>
-
-</div>
-
-
-        <!-- 提示词模板 部分 -->
-        <div>
-            <label for="prompt-template-textarea">提示词模板:</label>
-            <textarea id="prompt-template-textarea" rows="4"></textarea>
-            <p style="font-size: 12px; color: #8e9297; margin: 5px 0 0 0;">模板中必须包含 ${storyText} 占位符。</p>
-		    <button id="restore-theater-defaults-btn" class="major-action-button small-font-btn" style="margin-top:10px;"><i class="fas fa-undo"></i> 恢复小剧场默认模板</button>
-        </div>
-
-
-        <!-- 底部按钮组 -->
-        <div class="ai-api-config-buttons">
-            <button id="ai-api-config-cancel-btn">取消</button>
-            <button id="ai-api-config-save-btn">保存</button>
-        </div>
-
-    </div>
-</div>
-
-<div id="knowledge-search-api-settings-overlay" class="overlay">
-    <div class="settings-modal modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4>知识库API/世界书 设置</h4>
-        <div class="modal-content">
-
-            <!-- API 配置 -->
-<div class="settings-section">
-    <details>
-        <summary style="cursor: pointer; color: #ffd700; list-style: none;">
-            <h5><i class="fas fa-robot"></i> API 配置 (点击展开/折叠)</h5>
-        </summary>
-        <div style="margin-top: 15px;">
-            <label for="knowledge-search-api-url">API URL (需兼容OpenAI):</label>
-            <input type="text" id="knowledge-search-api-url" placeholder="例如: https://api.openai.com/v1">
-            
-            <label for="knowledge-search-api-key">API Key:</label>
-            <input type="password" id="knowledge-search-api-key" placeholder="sk-...">
-            
-            <label for="knowledge-search-api-model">模型 (Model):</label>
-            <select id="knowledge-search-api-model"></select>
-
-            <button id="fetch-knowledge-search-models-btn" class="major-action-button" style="width: 100%; margin-top: 15px;">
-                <i class="fas fa-sync-alt"></i> 获取可用模型
-            </button>
-        </div>
-    </details>
-</div>
-            <!-- 搜索指令模板 -->
-            <div class="settings-section">
-                <h5><i class="fas fa-scroll"></i> 搜索指令模板 (Prompt Template)</h5>
-                <textarea id="knowledge-search-prompt-template" rows="8">你是一个信息处理专家。根据用户提出的问题，搜索并整合信息，然后严格按照以下格式输出：
-[TITLE]
-为内容起一个简洁、精确的标题。
-[KEYWORDS]
-提取3-5个最核心的关键词，使用中文关键词，用英文逗号“,”分隔。这些关键词将用于游戏内的触发关键词，例如关于韩立的事件，触发词只需要是韩立或事件内发生的事情。
-[CONTENT]
-对信息进行详细、有条理的总结，不超过500字。
----
-用户问题：\${searchText}</textarea>
-                <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-                    模板中必须包含 <strong>${searchText}</strong> 占位符，它将被替换为搜索的关键词。
-                </p>
-            </div>
-
-            <!-- 搜索并填充知识库 -->
-            <div class="settings-section">
-                <h5><i class="fas fa-search"></i> 搜索并填充知识库</h5>
-                <label for="knowledge-search-input">输入关键词进行搜索:</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="knowledge-search-input" placeholder="例如: 天南大陆的历史" style="flex-grow: 1;">
-                    <button id="execute-knowledge-search-btn" class="major-action-button" style="width: auto; padding: 0 20px;"><i class="fas fa-search"></i> 搜索</button>
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h5><i class="fas fa-book"></i> 知识库内容 (可手动编辑)</h5>
-                <textarea id="knowledge-base-content-textarea" rows="3" placeholder="这里将显示搜索和总结后的内容，你也可以直接在此处编辑你的知识库..."></textarea>
-            </div>
-        </div>
-		
-		
-
-<!-- 世界书条目 -->
-<div class="settings-section">
-    <h5><i class="fas fa-atlas"></i> 世界书条目</h5>
-    
-    <!-- 这个按钮现在用来打开弹窗 -->
-    <button id="open-world-book-creator-btn" class="major-action-button" style="width: 100%; margin-bottom: 15px;">
-        <i class="fas fa-plus-circle"></i> 创建新世界书条目
-    </button>
-
-    <!-- 已保存的条目列表将显示在这里 -->
-    <div id="world-book-entries-list" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 5px;">
-        <!-- 条目将由JS动态生成 -->
-    </div>
-</div>
-
-
-
-        <!-- 底部按钮组 -->
-        <div class="button-group">
-            <button id="save-knowledge-search-api-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存并关闭</button>
-        </div>
-    </div>
-</div>
-<input type="file" id="background-json-import-input" class="hidden" accept=".json">
-
-
-<!-- 世界书条目编辑器弹窗 (新增) -->
-<div id="world-book-editor-overlay" class="overlay">
-    <div id="world-book-editor-modal" class="modal" style="max-width: 600px;">
-        <button class="modal-close-btn">&times;</button>
-        <h4 id="world-book-editor-title">创建新世界书条目</h4>
-        
-        <div class="settings-section">
-            <label for="world-book-entry-name">条目名称 (唯一):</label>
-            <input type="text" id="world-book-entry-name" placeholder="例如：天南大陆的历史">
-        </div>
-
-        <div class="settings-section">
-            <label>触发模式:</label>
-            <div style="display: flex; gap: 20px; margin-top: 5px;">
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                    <input type="radio" name="worldbook-editor-trigger" value="blue" checked>
-                    <i class="fas fa-lightbulb" style="color: #4fc3f7;"></i> 蓝灯 (时刻触发)
-                </label>
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                    <input type="radio" name="worldbook-editor-trigger" value="green">
-                    <i class="fas fa-lightbulb" style="color: #66bb6a;"></i> 绿灯 (关键词触发)
-                </label>
-            </div>
-        </div>
-
-        <div id="world-book-keywords-container" class="settings-section hidden">
-            <label for="world-book-trigger-keywords">触发关键词 (用英文逗号分隔):</label>
-            <textarea id="world-book-trigger-keywords" rows="2" placeholder="例如: 天南,历史,地理"></textarea>
-        </div>
-        
-        <div class="settings-section">
-            <label for="world-book-entry-content">条目内容:</label>
-            <textarea id="world-book-entry-content" rows="8" placeholder="条目的详细内容..."></textarea>
-        </div>
-
-        <div class="button-group">
-            <button id="save-world-book-btn" class="major-action-button">保存条目</button>
-        </div>
-    </div>
-</div>
-
-<div id="world-book-group-editor-overlay" class="overlay">
-    <div class="settings-panel world-book-group-editor">
-        <h3 id="world-book-group-editor-title">管理世界书分组</h3>
-        <button class="close-btn" onclick="this.closest('.overlay').classList.remove('visible')">×</button>
-        
-        <div id="world-book-group-entry-list" class="settings-content-box entry-list-box">
-        </div>
-        
-        <div class="panel-footer">
-            <button id="delete-world-book-group-btn" class="settings-btn danger-btn">删除整个分组</button>
-            <button onclick="document.getElementById('world-book-group-editor-overlay').classList.remove('visible')" class="settings-btn">关闭</button>
-        </div>
-    </div>
-</div>
-
-
-<div id="cloud-storage-settings-overlay" class="overlay">
-    <div id="cloud-settings-modal" class="settings-modal modal">
-        <button class="modal-close-btn">&times;</button>
-        <h4>云存档设置</h4>
-        <div class="settings-section">
-            <div class="context-control-item">
-                <input type="checkbox" id="cloud-storage-enabled-toggle">
-                <label for="cloud-storage-enabled-toggle"><strong>启用云存档功能</strong></label>
-            </div>
-            <p style="font-size: 0.9em; color: #b0b0b0; margin-top: 5px;">
-                启用后，读档/存档列表将优先从云端获取。
-            </p>
-        </div>
-        <div class="settings-section">
-            <label for="cloud-storage-api-url">云服务器地址:</label>
-            <input type="text" id="cloud-storage-api-url" placeholder="例如: http://你的服务器IP地址:3000">
-        </div>
-		<button id="upload-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-upload-alt"></i> 上传全部配置</button>
-<button id="download-all-settings-btn" class="major-action-button"><i class="fas fa-cloud-download-alt"></i> 下载全部配置</button>
-		        <div class="settings-section">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-    <p class="settings-subtitle" style="margin: 0;">
-        <i class="fas fa-cloud"></i> 云端存档列表
-    </p>
-    <div id="cloud-archive-actions">
-        <button id="refresh-cloud-archives" title="刷新列表" class="icon-button"><i class="fas fa-sync-alt"></i></button>
-        <button id="delete-cloud-archives" title="删除选中" class="icon-button danger"><i class="fas fa-trash-alt"></i></button>
-    </div>
-</div>
-            <div id="cloud-archive-list" style="max-height: 200px; overflow-y: auto;">
-            </div>
-        </div>
-				
-        <div class="button-group">
-            <button id="save-cloud-settings-btn" class="major-action-button"><i class="fas fa-save"></i> 保存设置</button>
-        </div>
-    </div>
-</div>
-
-<div id="player-display-settings-overlay" class="overlay">
-<div id="player-display-settings-modal" class="modal" style="max-width: 450px; display: flex; flex-direction: column; max-height: 70vh;">
-<button class="modal-close-btn">&times;</button>
-<h4>主角属性显示设置</h4>
-
-
-<div class="modal-content" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
-<div class="settings-section">
-<h5>默认属性</h5>
-<div id="player-default-fields-container" class="form-grid">
-</div>
-</div>
-<div class="settings-section">
-<h5>自定义属性</h5>
-<div id="player-custom-fields-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 4px;">
-</div>
-<button id="add-player-custom-field-btn" class="major-action-button" style="margin-top: 15px;"><i class="fas fa-plus"></i> 添加自定义项</button>
-</div>
-</div>
-
-<div class="button-group" style="margin-top: 20px; flex-shrink: 0;">
-<button id="save-player-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
-</div>
-</div>
-</div>
-
-<div id="npc-display-settings-overlay" class="overlay">
-    <div id="npc-display-settings-modal" class="modal" style="max-width: 450px;">
-        <button class="modal-close-btn">&times;</button>
-        <h4>NPC 显示内容设置</h4>
-        <div class="settings-section">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-sexExperience">
-                        <span>性经验</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-sensitiveParts">
-                        <span>敏感部位</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-genitalStatus">
-                        <span>性器状态</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-eroticValue">
-                        <span>情欲值</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-pleasureValue">
-                        <span>快感值</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-publicKink">
-                        <span>表性癖</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-privateKink">
-                        <span>里性癖</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-sexualConception">
-                        <span>性观念</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-skillsTab">
-                        <span>技能页</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="context-control-item">
-                        <input type="checkbox" id="toggle-traitsTab">
-                        <span>气运页</span>
-                    </label>
-                </div>
-            </div>
-            
-            <div id="custom-fields-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #555; display: flex; flex-direction: column; gap: 10px;">
-            </div>
-        </div>
-
-        <div class="button-group" style="flex-direction: column; gap: 10px;">
-            <button id="add-custom-field-btn" class="major-action-button" style="width: 100%;"><i class="fas fa-plus"></i> 添加自定义项</button>
-            <button id="save-npc-display-settings-btn" class="major-action-button" style="width: 100%;">保存设置</button>
-        </div>
-    </div>
-</div>
-<input type="file" id="thinking-presets-import-input" class="hidden" accept=".json">
-<input type="file" id="thinking-worldbook-input" class="hidden" accept=".json">
-<input type="file" id="image-tagging-json-import-input" class="hidden" accept=".json">
-<div id="map-management-overlay" class="overlay">
-<div id="map-management-modal" class="modal">
-<button class="modal-close-btn">&times;</button>
-<h4>全局地图管理</h4>
-<p style="text-align: center; color: var(--text-secondary); margin-top: -10px;">
-选择一个存档的地图作为默认地图。新存档将使用此地图，且“选择出生地”功能也将基于此地图。
-</p>
-<div id="map-list-container" style="flex-grow: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 10px; margin-bottom: 15px;">
-
-</div>
-<div class="button-group">
-<button id="set-default-map-btn" class="major-action-button" disabled><i class="fas fa-check"></i> 设为默认地图</button>
-</div>
-</div>
-</div>
 <script src="script.js"></script>
-
 </body>
 </html>
 ```
